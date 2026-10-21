@@ -181,7 +181,8 @@ src/test/java/………/
 
 - ………
 
-## 14 Spécifications d'utilisation de l'IA
+## 14 Spécifications d'utilisation de l'IA et autres sources
+
 IA utilisée : Deepseek V4.1 Flash 
 Applications utilisée Kilo Code
 
@@ -194,3 +195,5 @@ Capture d'écran de la conversation avec Deepseek:
 ![image6](https://media.discordapp.net/attachments/1290388444715159643/1562465282491031562/image.png?ex=6ada16b0&is=6ad8c530&hm=0a5116b8686d593ca33c54aa5484737da2b1809efd276581caeaf63a188ea7ef&=&format=webp&quality=lossless&width=1024&height=613)
 ![image7](https://media.discordapp.net/attachments/1290388444715159643/1562465282906136636/image.png?ex=6ada16b0&is=6ad8c530&hm=19f6d78ee1701d5a89809baaedcd631c4c22de149d98ca74ab16f69fb168f3e2&=&format=webp&quality=lossless&width=1024&height=613)
 ![image8](https://media.discordapp.net/attachments/1290388444715159643/1562465283241803877/image.png?ex=6ada16b0&is=6ad8c530&hm=8c8527af4181127df0461b96ff618ddc027ae9d98025539cc74eb8724461df36&=&format=webp&quality=lossless&width=1024&height=613)
+
+Pour les animations de fond = https://reactbits.dev 
