@@ -76,14 +76,27 @@ les autres doivent rester verts.
   packages de test dédiés en Boot 4 (ex. `org.springframework.boot.webmvc.test.autoconfigure`).
 - Le build Maven ne doit jamais dépendre de Node/Bun.
 - `RestClient.Builder` n'est pas auto-configuré : construire le client dans `MediaConfig`.
+- Le dépôt est dans un dossier synchronisé iCloud : des copies « fichier 2.java » peuvent
+  apparaître. Les supprimer avant de builder (`find src -name "* [0-9].*" -delete`) ;
+  `.gitignore` ignore ces suffixes.
 
-## Médias TMDB
+## Médias et catalogue
 
 - `GET /api/films/{id}/media` renvoie affiche, bannière, clé YouTube, synopsis et note.
+- Les 6 films de démonstration (V3) embarquent leurs URLs TMDB et leur clé YouTube :
+  les affiches et la bande-annonce fonctionnent **sans clé**.
+- Un film ajouté via `POST /api/programmation/films/depuis-tmdb` stocke ses médias
+  en base ; la clé `TMDB_API_KEY` n'est nécessaire qu'au moment de la recherche/import.
 - La clé vient uniquement de `TMDB_API_KEY` (v3 ou jeton v4) : jamais dans le frontend,
-  jamais dans un fichier versionné. Sans clé, l'API renvoie des champs vides et l'UI
-  utilise ses dégradés.
+  jamais dans un fichier versionné.
 - Cache mémoire 12 h ; un échec est mis en cache 10 min pour ne pas marteler TMDB.
+
+## Réservations client
+
+- `reservation.client_username` identifie le propriétaire (V3).
+- `GET /api/reservations/mes-reservations` retourne les réservations confirmées à venir
+  du compte connecté (CLIENT ou ADMIN).
+- Un CLIENT ne peut annuler que ses propres réservations ; ADMIN peut tout annuler.
 
 ## CI et image
 

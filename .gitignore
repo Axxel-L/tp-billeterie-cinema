@@ -20,3 +20,11 @@ src/main/resources/static/*
 .env
 .env.*
 .kilo/
+
+# Copies de conflit iCloud (dossier Documents synchronisé)
+* 2.*
+* 3.*
+* 4.*
+* 2
+* 3
+* 4

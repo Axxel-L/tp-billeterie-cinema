@@ -62,10 +62,13 @@ Authentification **HTTP Basic** ; lectures publiques sans identifiants.
 | GET | `/api/salles` | public | 200 (support du formulaire de programmation) |
 | GET | `/api/auth/me` | authentifié | 200, identifiant et rôles |
 | POST | `/api/programmation/films` | PROGRAMMATEUR, ADMIN | 201 + `Location` |
+| GET | `/api/programmation/films/recherche?titre=` | PROGRAMMATEUR, ADMIN | 200, résultats TMDB (503 sans clé) |
+| POST | `/api/programmation/films/depuis-tmdb` | PROGRAMMATEUR, ADMIN | 201, 409, 503 |
 | POST | `/api/programmation/seances` | PROGRAMMATEUR, ADMIN | 201 + `Location`, 400 |
 | POST | `/api/admin/salles` | ADMIN | 201, 400, 409 |
 | POST | `/api/reservations` | CLIENT, ADMIN | 201, 400, 404, 409 |
-| DELETE | `/api/reservations/{code}` | CLIENT, ADMIN | 204 (idempotent), 404 |
+| GET | `/api/reservations/mes-reservations` | CLIENT, ADMIN | 200, réservations à venir du compte |
+| DELETE | `/api/reservations/{code}` | CLIENT (propriétaire), ADMIN | 204 (idempotent), 404 |
 | GET | `/actuator/health` | public | 200 |
 | GET | `/v3/api-docs` · `/swagger-ui.html` | public | OpenAPI / Swagger UI |
 
@@ -83,23 +86,39 @@ curl -u client:client123 -X POST http://localhost:8080/api/reservations \
  "creeeLe":"2026-10-21T14:17:34.257798"}
 ```
 
-### Médias TMDB (optionnel)
+### Catalogue et médias
 
-Le frontend affiche de vraies affiches, bannières et bandes-annonces si une clé TMDB est
-fournie au **serveur** :
+La migration **V3** remplace la démo par **6 vrais films** (Chihiro, Parasite, Inception,
+Dune : Deuxième Partie, Oppenheimer, Interstellar) avec leurs affiches TMDB, leurs clés
+de bande-annonce YouTube, un synopsis et une note. **Aucune clé n'est nécessaire pour
+les voir** : les URLs sont stockées en base et l'endpoint `GET /api/films/{id}/media`
+les renvoie directement.
+
+Pour ajouter un film, l'interface de pilotage interroge TMDB et n'accepte que des
+fiches réelles :
 
 ```bash
 export TMDB_API_KEY=...        # clé v3 (api_key) ou jeton v4 (Bearer)
 ./mvnw spring-boot:run
 ```
 
-- `GET /api/films/{id}/media` interroge TMDB (recherche par titre + année, puis détail
-  avec `videos`), met en cache 12 h et renvoie `{afficheUrl, bandeauUrl, bandeAnnonceCle,
-  synopsis, note}`.
-- Sans clé, l'endpoint renvoie `{}` : la SPA conserve ses dégradés, la bannière animée
-  et le reste du parcours fonctionne.
-- La clé n'est **jamais** dans le bundle React ni dans un fichier versionné. Un échec est
-  mis en cache 10 min pour ne pas marteler l'API.
+- `GET /api/programmation/films/recherche?titre=` cherche dans TMDB (titre, année,
+  affiche, synopsis).
+- `POST /api/programmation/films/depuis-tmdb` avec `{"tmdbId": 693134}` recharge la fiche
+  **côté serveur** (titre, genre, durée, date, affiche, bannière, bande-annonce) et la
+  stocke : le client ne peut pas inventer un film.
+- Sans clé, la recherche répond **503 `TMDB_NON_CONFIGURE`** avec un message explicite
+  dans l'UI ; les films déjà en base restent entièrement fonctionnels.
+- La clé n'est **jamais** dans le bundle React ni dans un fichier versionné. Cache
+  mémoire 12 h, échec 10 min.
+
+### Mes réservations
+
+`GET /api/reservations/mes-reservations` retourne les réservations **CONFIRMEE** dont la
+séance est à venir, pour l'utilisateur authentifié. Chaque réservation est liée à son
+propriétaire (`reservation.client_username`, V3) : un CLIENT ne peut annuler que les
+siennes, un ADMIN peut annuler n'importe quel code. La page **Séances** affiche ce bloc
+dès qu'un client est connecté, avec le code et un bouton d'annulation.
 
 ### Erreurs
 
@@ -117,8 +136,9 @@ trace ni détail SQL :
 
 ## Persistance
 
-- Flyway `V1__schema_initial.sql` (tables, clés étrangères, index, `CHECK`) puis
-  `V2__donnees_demo.sql` (3 films, 2 salles, 3 séances sans réservation).
+- Flyway `V1__schema_initial.sql` (tables, clés étrangères, index, `CHECK`),
+  `V2__donnees_demo.sql` (première démo) puis `V3__medias_et_reservations_client.sql`
+  (colonnes médias, `reservation.client_username`, 6 films réels et leurs séances).
 - `spring.jpa.hibernate.ddl-auto=validate` : Hibernate ne crée jamais le schéma.
 - MySQL uniquement (pas de H2), prix en `BigDecimal` / `DECIMAL(8,2)`,
   unicité sur `reservation.code` et `salle.nom`.
@@ -160,14 +180,14 @@ deux requêtes simultanées de 4 places → exactement une réussit, total final
 
 | Classe | Type | Couverture |
 |---|---|---|
-| `ReservationServiceTest` | unitaire (Mockito) | montant, capacité insuffisante, annulation, idempotence |
-| `MediaServiceTest` | unitaire (MockRestServiceServer) | mapping TMDB, absence de résultat, absence de clé |
+| `ReservationServiceTest` | unitaire (Mockito) | montant, capacité, annulation, propriété, mes réservations |
+| `MediaServiceTest` | unitaire (MockRestServiceServer) | mapping TMDB, recherche, détail, absence de clé |
 | `ReservationControllerTest` | MVC (`@WebMvcTest`) | 201, 400, 401, 403, 201 admin |
 | `ReservationRepositoryTest` | JPA + MySQL | somme des places confirmées, recherche par intervalle |
-| `ReservationIntegrationTest` | intégration + MySQL | migrations, réservation réelle, annulation, 409 |
+| `ReservationIntegrationTest` | intégration + MySQL | migrations, médias de démo, réservation, mes réservations, 409, 503 |
 | `ReservationConcurrencyTest` | concurrence + MySQL | deux threads, aucune surréservation |
 
-22 tests au total. Les tests MySQL utilisent **Testcontainers** (`mysql:8.4`) et sont
+29 tests au total. Les tests MySQL utilisent **Testcontainers** (`mysql:8.4`) et sont
 ignorés sans Docker. Le test de concurrence n'est pas `@Transactional` : chaque thread
 ouvre sa propre transaction, ce qui est indispensable pour éprouver le verrou.
 
@@ -178,6 +198,8 @@ ouvre sa propre transaction, ce qui est indispensable pour éprouver le verrou.
 - **CSRF désactivé** : il n'y a ni cookie de session ni jeton côté client, donc aucune
   requête ambiante à protéger ; l'authentification est portée par l'en-tête `Authorization`.
 - Injections SQL : uniquement Spring Data / JPQL paramétré, aucune concaténation.
+- Un CLIENT ne peut annuler que ses propres réservations (comparaison du
+  `client_username`) ; un ADMIN peut annuler n'importe quel code.
 - Actuator : seul `health` est exposé, sans détail.
 - La SPA ne conserve **aucun identifiant dans `localStorage`** : l'en-tête Basic vit en
   mémoire et disparaît au rechargement. Aucun CDN de code, aucun script tiers non versionné.
@@ -202,9 +224,11 @@ bun run typecheck
   `--lg-*` (aucune surcouche de style).
 - **Fond animé** : composant React Bits `GradientASCII` (WebGL2) copié dans
   `src/components/`, avec repli CSS et respect de `prefers-reduced-motion`.
-- **Bande-annonce en fond de hero** : lue via `youtube-nocookie.com` si TMDB fournit une
-  clé, désactivée en mobile, en économie de données et en mouvement réduit.
-- Affiches et bannières TMDB ; dégradés générés en repli.
+- **Bande-annonce en fond de hero** : lue via `youtube-nocookie.com` avec les clés
+  stockées en base, désactivée en mobile, en économie de données et en mouvement réduit.
+- Affiches et bannières réelles (TMDB) ; dégradés générés en repli.
+- Le formulaire d'ajout de film passe par la recherche TMDB : impossible de saisir un
+  film qui n'existe pas. Les séances et les salles restent manuelles.
 - Performance : routes en `lazy()`, CSS découpé, polices Manrope auto-hébergées, zéro CDN
   de code, squelettes, `prefers-reduced-motion` et `prefers-reduced-transparency`.
 - Le build Maven ne dépend jamais de Bun ; les assets générés sont ignorés par Git.
@@ -243,6 +267,17 @@ frontend/                          SPA Vite + React 19 + Tailwind + liquid glass
 .github/workflows/ci.yml           backend, frontend, image GHCR
 Dockerfile                         build Bun + Maven + runtime JRE 25
 ```
+
+## Dépannage
+
+- **Fichiers « 2 », « 3 »…** : le dépôt est dans un dossier synchronisé iCloud, qui peut
+  créer des copies de conflit. Avant un build :
+  `find src -name "* [0-9].*" -delete` puis `./mvnw clean verify`.
+- **Testcontainers** : avec colima, exporter `DOCKER_HOST` et
+  `TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE` (voir plus haut), sinon les tests MySQL sont
+  ignorés.
+- **Aucune affiche** : les 6 films de démo en ont une sans configuration. Pour en ajouter
+  d'autres, `TMDB_API_KEY` est nécessaire.
 
 ## Bonus
 
