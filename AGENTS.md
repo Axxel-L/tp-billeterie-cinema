@@ -72,6 +72,16 @@ les autres doivent rester verts.
 - Frontend : aucun token ni mot de passe dans `localStorage`, pas de CDN,
   assets auto-hébergés, effets respectant `prefers-reduced-motion`.
 
+## Performance frontend
+
+- Pas de WebGL, pas de filtre SVG ni de `backdrop-filter` : le fond `GridScan` et le verre
+  sont en CSS (transform/opacity uniquement).
+- Les médias des films arrivent avec `GET /api/films` : ne pas réintroduire une requête
+  par carte. Utiliser `srcset` (w342/w500/w780), `loading="lazy"` et `SmartImage`.
+- Chaque page doit rester derrière `PageGate` tant que ses données et ses images visibles
+  ne sont pas prêtes (timeout 3 s).
+- La bande-annonce se charge au clic, jamais en autoplay dans le hero.
+
 ## Pièges connus
 
 - `@DataJpaTest` remplace la DataSource : garder `@AutoConfigureTestDatabase(replace = NONE)`.
@@ -88,6 +98,7 @@ les autres doivent rester verts.
 ## Médias et catalogue
 
 - `GET /api/films/{id}/media` renvoie affiche, bannière, clé YouTube, synopsis et note.
+  `GET /api/films` expose aussi ces champs pour éviter le N+1 côté SPA.
 - Les 6 films de démonstration (V3) embarquent leurs URLs TMDB et leur clé YouTube :
   les affiches et la bande-annonce fonctionnent **sans clé**.
 - Un film ajouté via `POST /api/programmation/films/depuis-tmdb` stocke ses médias
@@ -111,7 +122,7 @@ les autres doivent rester verts.
 
 ## Commits
 
-- Messages **en français**, préfixés : `feat:`, `fix:`, `chore:` (infra/outillage,
+- Messages **en français**, préfixés : `feat:`, `fix:`, `perf:`, `chore:` (infra/outillage,
   parfois noté `core:`), `docs:`, `test:`, `refactor:`.
 - Sujet à l'impératif, ≤ 72 caractères, puis un corps qui explique le **pourquoi**
   et l'impact (barème, sécurité, concurrence, perf).

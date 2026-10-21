@@ -108,8 +108,9 @@ curl -u client:client123 -X POST http://localhost:8080/api/reservations \
 La migration **V3** remplace la démo par **6 vrais films** (Chihiro, Parasite, Inception,
 Dune : Deuxième Partie, Oppenheimer, Interstellar) avec leurs affiches TMDB, leurs clés
 de bande-annonce YouTube, un synopsis et une note. **Aucune clé n'est nécessaire pour
-les voir** : les URLs sont stockées en base et l'endpoint `GET /api/films/{id}/media`
-les renvoie directement.
+les voir** : les URLs sont stockées en base et la liste `GET /api/films` les expose
+directement (aucune requête média par carte). L'endpoint `GET /api/films/{id}/media`
+reste disponible pour un accès ciblé.
 
 Pour ajouter un film, l'interface de pilotage interroge TMDB et n'accepte que des
 fiches réelles :
@@ -235,19 +236,23 @@ bun run typecheck
 - **Bun** pour toutes les commandes (installation, dev, build, typecheck). Aucun
   `package-lock.json`.
 - React 19 + Vite + TypeScript, **Tailwind CSS v4**, **Heroicons**, TanStack Query.
-- **Liquid glass officiel** : `liquid-glass.js` et `components.js` auto-hébergés dans
-  `public/liquidglass/`, chargés après le premier rendu React. Les éléments `<lg-navbar>`,
-  `<lg-panel>` et `<lg-button>` sont utilisés directement, thémés par les variables
-  `--lg-*` (aucune surcouche de style).
-- **Fond animé** : composant React Bits `GradientASCII` (WebGL2) copié dans
-  `src/components/`, avec repli CSS et respect de `prefers-reduced-motion`.
-- **Bande-annonce en fond de hero** : lue via `youtube-nocookie.com` avec les clés
-  stockées en base, désactivée en mobile, en économie de données et en mouvement réduit.
-- Affiches et bannières réelles (TMDB) ; dégradés générés en repli.
+- **Verre léger** : classes `.glass-panel` / `.glass-button` (dégradé, bord, ombre), sans
+  `backdrop-filter` ni filtre SVG. Le moteur liquid-glass a été retiré : ses filtres SVG
+  par élément (navbar, panneaux, boutons) provoquaient des ralentissements au scroll.
+- **Fond GridScan** réimplémenté en CSS pur (grille en perspective + faisceau animé),
+  sans WebGL ni shader plein écran. Une seule animation `transform` GPU.
+- **Bande-annonce à la demande** dans la fiche film : l'iframe YouTube n'est chargée
+  qu'au clic et affiche un état de chargement.
+- Affiches TMDB en `srcset` (w342/w500/w780), `loading="lazy"`, `decoding="async"` et
+  fondu à l'arrivée. Seules les images de la première vue sont préchargées.
+- **Écran de chargement par page** (`PageGate`) : les données et les images visibles sont
+  attendues (timeout 3 s) avant l'affichage. Un loader inline couvre aussi le boot avant
+  l'hydratation React.
 - Le formulaire d'ajout de film passe par la recherche TMDB : impossible de saisir un
   film qui n'existe pas. Les séances et les salles restent manuelles.
-- Performance : routes en `lazy()`, CSS découpé, polices Manrope auto-hébergées, zéro CDN
-  de code, squelettes, `prefers-reduced-motion` et `prefers-reduced-transparency`.
+- Performance : routes en `lazy()`, CSS découpé, polices auto-hébergées, zéro CDN de code,
+  zéro WebGL, zéro `backdrop-filter`, animations réduites sur mobile et en
+  `prefers-reduced-motion`.
 - Le build Maven ne dépend jamais de Bun ; les assets générés sont ignorés par Git.
 
 ## CI et déploiement
@@ -280,7 +285,7 @@ src/main/java/fr/butinfo/r508/billetterie/
   error/        exceptions métier, ApiError, GlobalExceptionHandler
 src/main/resources/db/migration/   V1 schéma, V2 données de démo
 src/test/java/                     unitaire, MVC, JPA, intégration, concurrence
-frontend/                          SPA Vite + React 19 + Tailwind + liquid glass
+frontend/                          SPA Vite + React 19 + Tailwind + GridScan CSS
 .github/workflows/ci.yml           backend, frontend, image GHCR
 Dockerfile                         build Bun + Maven + runtime JRE 25
 ```
