@@ -74,13 +74,15 @@ les autres doivent rester verts.
 
 ## Performance frontend
 
-- Pas de WebGL, pas de filtre SVG ni de `backdrop-filter` : le fond `GridScan` et le verre
-  sont en CSS (transform/opacity uniquement).
+- Pas de WebGL. Le moteur liquid glass (filtres SVG + `backdrop-filter`) est limité à
+  `lg-navbar` et `lg-button` ; les panneaux restent en verre CSS. Ne pas l'étendre aux cartes.
+- Le fond `GridScan` est en CSS (transform/opacity uniquement), sans shader plein écran.
 - Les médias des films arrivent avec `GET /api/films` : ne pas réintroduire une requête
   par carte. Utiliser `srcset` (w342/w500/w780), `loading="lazy"` et `SmartImage`.
 - Chaque page doit rester derrière `PageGate` tant que ses données et ses images visibles
   ne sont pas prêtes (timeout 3 s).
-- La bande-annonce se charge au clic, jamais en autoplay dans le hero.
+- La vidéo du hero est un trailer muet en autoplay sur desktop ; elle est désactivée sur
+  mobile, en `prefers-reduced-motion` et en économie de données. Le son reste à la demande.
 
 ## Pièges connus
 
