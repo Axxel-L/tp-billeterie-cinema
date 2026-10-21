@@ -21,7 +21,7 @@ export function FilmCard({ film, index, onOuvrir }: Props) {
     <button
       type="button"
       onClick={() => onOuvrir(film)}
-      className="group relative block w-full overflow-hidden rounded-3xl border border-white/20 bg-ink-2 text-left transition duration-300 hover:-translate-y-1.5 hover:border-white/30"
+      className="group relative block w-full overflow-hidden rounded-[26px] border border-white/20 bg-ink-2 text-left transition duration-300 hover:-translate-y-1.5 hover:border-white/30"
       aria-label={`Voir la fiche de ${film.titre}`}
     >
       <div className="relative aspect-[2/3] overflow-hidden">

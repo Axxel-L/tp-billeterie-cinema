@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { urlVideo } from "../lib/video";
 
 interface Props {
@@ -11,9 +11,10 @@ interface Props {
 export function HeroMedia({ image, site, cle, titre }: Props) {
   const [video, setVideo] = useState(false);
   const [videoPrete, setVideoPrete] = useState(false);
+  const iframe = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
-    if (!cle || (site ?? "").toLowerCase().includes("youtube")) {
+    if (!cle) {
       return undefined;
     }
     const mouvementReduit = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -37,7 +38,9 @@ export function HeroMedia({ image, site, cle, titre }: Props) {
           id="hero-media"
           src={image}
           alt={`Visuel de ${titre}`}
-          className={`kenburns ${videoPrete ? "opacity-40" : "opacity-100"}`}
+          className={`kenburns transition-opacity duration-700 ${
+            videoPrete ? "opacity-0" : "opacity-100"
+          }`}
           fetchPriority="high"
           decoding="async"
         />
@@ -47,12 +50,20 @@ export function HeroMedia({ image, site, cle, titre }: Props) {
 
       {source ? (
         <iframe
+          ref={iframe}
           title={`Bande-annonce de ${titre}`}
           src={source}
-          allow="autoplay; fullscreen; picture-in-picture"
-          onLoad={() => setVideoPrete(true)}
+          allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+          onLoad={() => {
+            setVideoPrete(true);
+            iframe.current?.contentWindow?.postMessage(
+              '{"event":"command","func":"playVideo","args":""}',
+              "*",
+            );
+          }}
           tabIndex={-1}
           aria-hidden="true"
+          className={`transition-opacity duration-700 ${videoPrete ? "opacity-100" : "opacity-0"}`}
         />
       ) : null}
     </div>

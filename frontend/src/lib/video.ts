@@ -51,6 +51,7 @@ export function urlVideo(
     mute: muted ? "1" : "0",
     rel: "0",
     playsinline: "1",
+    enablejsapi: "1",
   });
   if (options.background) {
     parametres.set("controls", "0");

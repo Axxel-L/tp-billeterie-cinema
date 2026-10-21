@@ -168,7 +168,7 @@ function RechercheFilm() {
 
       {erreur ? (
         <p
-          className="mt-4 rounded-xl border border-gold/30 bg-gold/10 px-3 py-2 text-sm text-gold"
+          className="mt-4 rounded-2xl border border-gold/30 bg-gold/10 px-3 py-2 text-sm text-gold"
           role="alert"
         >
           {erreur.status === 503
@@ -179,7 +179,7 @@ function RechercheFilm() {
 
       {retour ? (
         <p
-          className={`mt-4 rounded-xl border px-3 py-2 text-sm ${
+          className={`mt-4 rounded-2xl border px-3 py-2 text-sm ${
             retour.ton === "ok"
               ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200"
               : "border-brand/30 bg-brand/10 text-brand-2"
@@ -230,8 +230,8 @@ function LigneResultat({
   onAjouter: () => void;
 }) {
   return (
-    <li className="flex gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-      <div className="h-24 w-16 shrink-0 overflow-hidden rounded-xl bg-ink-2">
+    <li className="flex gap-4 rounded-[22px] border border-white/10 bg-white/[0.03] p-3">
+      <div className="h-24 w-16 shrink-0 overflow-hidden rounded-2xl bg-ink-2">
         {film.afficheUrl ? (
           <img
             src={film.afficheUrl}
@@ -382,7 +382,7 @@ function FormulaireSeance() {
         </div>
         {retour ? (
           <p
-            className={`rounded-xl border px-3 py-2 text-sm ${
+            className={`rounded-2xl border px-3 py-2 text-sm ${
               retour.ton === "ok"
                 ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200"
                 : "border-brand/30 bg-brand/10 text-brand-2"
@@ -450,7 +450,7 @@ function FormulaireSalle() {
         </label>
         {retour ? (
           <p
-            className={`rounded-xl border px-3 py-2 text-sm ${
+            className={`rounded-2xl border px-3 py-2 text-sm ${
               retour.ton === "ok"
                 ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200"
                 : "border-brand/30 bg-brand/10 text-brand-2"

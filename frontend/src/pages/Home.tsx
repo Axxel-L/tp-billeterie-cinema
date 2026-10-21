@@ -112,7 +112,7 @@ export default function Home() {
             </div>
 
             {prochaine ? (
-              <div className="mt-8 inline-flex flex-wrap items-center gap-x-5 gap-y-2 rounded-2xl border border-white/20 bg-ink/55 px-4 py-3 text-xs text-white/75">
+              <div className="mt-8 inline-flex flex-wrap items-center gap-x-5 gap-y-2 rounded-[22px] border border-white/20 bg-ink/55 px-4 py-3 text-xs text-white/75">
                 <span className="font-semibold text-white">Prochaine séance</span>
                 <span>
                   {formatJour(prochaine.debut)} · {formatHeure(prochaine.debut)}

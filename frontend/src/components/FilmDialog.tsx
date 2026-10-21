@@ -124,7 +124,7 @@ export function FilmDialog({ film, onClose, lancerBandeAnnonce = false }: Props)
               ].map((element) => (
                 <div
                   key={element.label}
-                  className="rounded-2xl border border-white/10 bg-white/[0.03] p-3"
+                  className="rounded-[22px] border border-white/10 bg-white/[0.03] p-3"
                 >
                   <dt className="text-[10px] uppercase tracking-[0.16em] text-mist">
                     {element.label}
@@ -135,7 +135,7 @@ export function FilmDialog({ film, onClose, lancerBandeAnnonce = false }: Props)
             </dl>
 
             {sourceVideo ? (
-              <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-white/15 bg-black">
+              <div className="relative aspect-video w-full overflow-hidden rounded-[22px] border border-white/15 bg-black">
                 {!videoChargee ? (
                   <div className="absolute inset-0 grid place-items-center text-xs uppercase tracking-[0.2em] text-mist">
                     Chargement de la bande-annonce…

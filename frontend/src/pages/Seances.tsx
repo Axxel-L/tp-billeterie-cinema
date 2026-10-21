@@ -170,7 +170,7 @@ export default function Seances() {
         </section>
       ) : null}
 
-      <GlassPanel radius="22" className="mt-8 block">
+      <GlassPanel radius="26" className="mt-8 block">
         <div className="flex flex-wrap items-end gap-4 p-5">
           <label className="block min-w-40 flex-1">
             <span className="field-label">Du</span>
@@ -218,11 +218,11 @@ export default function Seances() {
                 <span className="text-xs text-mist">{seances.length} séance(s)</span>
               </div>
 
-              <div className="surface divide-y divide-white/10 overflow-hidden">
+              <div className="space-y-3">
                 {seances.map((seance) => (
                   <div
                     key={seance.id}
-                    className="flex flex-wrap items-center gap-x-6 gap-y-3 p-4 transition hover:bg-white/[0.025] sm:p-5"
+                    className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-[26px] border border-white/20 bg-white/[0.04] p-4 transition hover:border-white/30 hover:bg-white/[0.06] sm:p-5"
                   >
                     <span className="w-20 font-display text-3xl font-extrabold tracking-tight text-brand-2">
                       {formatHeure(seance.debut)}

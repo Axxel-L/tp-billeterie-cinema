@@ -113,7 +113,7 @@ html:root {
   }
 
   .surface {
-    @apply rounded-3xl border border-white/20 bg-white/[0.04];
+    @apply rounded-[26px] border border-white/20 bg-white/[0.04];
   }
 
   .code {

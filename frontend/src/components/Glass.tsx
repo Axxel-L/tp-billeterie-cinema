@@ -11,16 +11,22 @@ type PanelProps = ComponentPropsWithoutRef<"div"> & {
 };
 
 export function GlassPanel({
-  radius = 22,
+  radius = 26,
   tone = "clear",
   className,
   style,
   children,
   ...rest
 }: PanelProps) {
+  const rayon =
+    typeof radius === "number"
+      ? `${radius}px`
+      : /^\d+$/.test(radius)
+        ? `${radius}px`
+        : radius;
   const variables = {
     ...style,
-    borderRadius: typeof radius === "number" ? `${radius}px` : radius,
+    borderRadius: rayon,
   } as CSSProperties;
 
   return (
