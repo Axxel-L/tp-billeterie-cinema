@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { Link, NavLink } from "react-router-dom";
 import {
   ArrowRightOnRectangleIcon,
   Bars3Icon,
@@ -18,37 +18,13 @@ const LIENS = [
   { to: "/reservation", label: "Réserver" },
 ];
 
-type NavbarElement = HTMLElement & {
-  setCurrent?: (index: number) => void;
-  refresh?: () => void;
-};
-
 export function Navigation() {
   const { session, logout, openLogin, hasRole } = useAuth();
-  const { pathname } = useLocation();
-  const navbar = useRef<HTMLElement | null>(null);
   const [menuOuvert, setMenuOuvert] = useState(false);
-
-  useEffect(() => {
-    const element = navbar.current as NavbarElement | null;
-    const index = LIENS.findIndex((lien) =>
-      lien.to === "/" ? pathname === "/" : pathname.startsWith(lien.to),
-    );
-    element?.setCurrent?.(index >= 0 ? index : 0);
-    element?.refresh?.();
-  }, [pathname]);
-
-  useEffect(() => {
-    document.fonts?.ready.then(() => (navbar.current as NavbarElement | null)?.refresh?.());
-  }, []);
-
-  useEffect(() => {
-    setMenuOuvert(false);
-  }, [pathname]);
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-40">
+      <header className="fixed inset-x-0 top-0 z-40 bg-gradient-to-b from-ink via-ink/80 to-transparent">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
           <Link to="/" className="group flex items-center gap-3" aria-label="Billetterie, accueil">
             <Logo className="h-11 w-11 drop-shadow-[0_10px_24px_rgba(255,61,113,0.35)] transition group-hover:scale-105" />
@@ -62,15 +38,25 @@ export function Navigation() {
             </span>
           </Link>
 
-          <div className="hidden md:block">
-            <lg-navbar ref={navbar} aria-label="Navigation principale">
-              {LIENS.map((lien) => (
-                <NavLink key={lien.to} to={lien.to} end={lien.to === "/"}>
-                  {lien.label}
-                </NavLink>
-              ))}
-            </lg-navbar>
-          </div>
+          <nav
+            className="hidden items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1 md:flex"
+            aria-label="Navigation principale"
+          >
+            {LIENS.map((lien) => (
+              <NavLink
+                key={lien.to}
+                to={lien.to}
+                end={lien.to === "/"}
+                className={({ isActive }) =>
+                  `rounded-full px-4 py-2 text-sm font-semibold transition ${
+                    isActive ? "bg-white/10 text-white" : "text-mist hover:text-white"
+                  }`
+                }
+              >
+                {lien.label}
+              </NavLink>
+            ))}
+          </nav>
 
           <div className="flex items-center gap-2">
             {session ? (
@@ -115,21 +101,27 @@ export function Navigation() {
 
       {menuOuvert ? (
         <div
-          className="fixed inset-0 z-30 bg-ink/70 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-30 bg-ink/80 md:hidden"
           onClick={() => setMenuOuvert(false)}
           role="presentation"
         >
-          <div className="mx-auto mt-24 max-w-sm px-4" onClick={(evenement) => evenement.stopPropagation()}>
-            <GlassPanel radius="28" className="block p-4">
+          <div
+            className="mx-auto mt-24 max-w-sm px-4"
+            onClick={(evenement) => evenement.stopPropagation()}
+          >
+            <GlassPanel radius="28" className="p-4">
               <nav className="flex flex-col gap-1" aria-label="Navigation mobile">
                 {LIENS.map((lien) => (
                   <NavLink
                     key={lien.to}
                     to={lien.to}
                     end={lien.to === "/"}
+                    onClick={() => setMenuOuvert(false)}
                     className={({ isActive }) =>
                       `rounded-2xl px-4 py-3 text-base font-semibold transition ${
-                        isActive ? "bg-white/10 text-white" : "text-mist hover:bg-white/5 hover:text-white"
+                        isActive
+                          ? "bg-white/10 text-white"
+                          : "text-mist hover:bg-white/5 hover:text-white"
                       }`
                     }
                   >
@@ -137,7 +129,11 @@ export function Navigation() {
                   </NavLink>
                 ))}
                 {hasRole("ADMIN", "PROGRAMMATEUR") ? (
-                  <Link to="/admin" className="rounded-2xl px-4 py-3 text-base font-semibold text-mist">
+                  <Link
+                    to="/admin"
+                    onClick={() => setMenuOuvert(false)}
+                    className="rounded-2xl px-4 py-3 text-base font-semibold text-mist"
+                  >
                     Pilotage
                   </Link>
                 ) : null}

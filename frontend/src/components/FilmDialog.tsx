@@ -1,11 +1,10 @@
-import { useEffect, useState, type CSSProperties } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { ClockIcon, PlayIcon, StarIcon, XMarkIcon } from "@heroicons/react/24/solid";
-import { api } from "../api/client";
 import type { Film } from "../api/types";
 import { formatDateCourte, initiales } from "../lib/format";
 import { GlassButton, GlassPanel } from "./Glass";
 import { GlassLink } from "./GlassLink";
+import { SmartImage, tmdbSrcSet } from "./SmartImage";
 
 interface Props {
   film: Film;
@@ -14,11 +13,7 @@ interface Props {
 
 export function FilmDialog({ film, onClose }: Props) {
   const [bandeAnnonce, setBandeAnnonce] = useState(false);
-  const media = useQuery({
-    queryKey: ["media", film.id],
-    queryFn: () => api.filmMedia(film.id),
-    staleTime: 60 * 60 * 1000,
-  });
+  const [videoChargee, setVideoChargee] = useState(false);
 
   useEffect(() => {
     const surTouche = (evenement: KeyboardEvent) => {
@@ -35,11 +30,11 @@ export function FilmDialog({ film, onClose }: Props) {
     };
   }, [onClose]);
 
-  const cle = media.data?.bandeAnnonceCle;
+  const cle = film.bandeAnnonceCle;
 
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-ink/70 p-4 backdrop-blur-lg"
+      className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-ink/85 p-4"
       role="presentation"
       onMouseDown={onClose}
     >
@@ -49,34 +44,32 @@ export function FilmDialog({ film, onClose }: Props) {
         aria-modal="true"
         aria-labelledby="titre-film"
         className="relative w-full max-w-3xl overflow-hidden"
-        style={{ "--lg-tint": "rgb(8 10 18 / 0.35)" } as CSSProperties}
         onMouseDown={(evenement) => evenement.stopPropagation()}
       >
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 z-20 grid h-10 w-10 place-items-center rounded-full border border-white/20 bg-black/35 text-white backdrop-blur-md transition hover:bg-white/15"
+          className="absolute right-4 top-4 z-20 grid h-10 w-10 place-items-center rounded-full border border-white/20 bg-black/35 text-white transition hover:bg-white/15"
           aria-label="Fermer la fiche"
         >
           <XMarkIcon className="h-5 w-5" />
         </button>
 
         <div className="grid md:grid-cols-[240px_1fr]">
-          <div className="relative aspect-[2/3] overflow-hidden md:aspect-auto md:min-h-[360px]">
-            {media.data?.afficheUrl ? (
-              <img
-                id="fiche-affiche"
-                src={media.data.afficheUrl}
-                alt={`Affiche de ${film.titre}`}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="hero-ambient flex h-full min-h-[280px] w-full items-center justify-center p-6">
-                <span className="font-display text-6xl font-black tracking-tighter text-white/90">
-                  {initiales(film.titre)}
-                </span>
-              </div>
-            )}
+          <div className="relative aspect-[2/3] overflow-hidden bg-ink-2 md:aspect-auto md:min-h-[360px]">
+            <div className="hero-ambient absolute inset-0 flex items-center justify-center p-6">
+              <span className="font-display text-6xl font-black tracking-tighter text-white/90">
+                {initiales(film.titre)}
+              </span>
+            </div>
+            <SmartImage
+              src={film.afficheUrl}
+              srcSet={tmdbSrcSet(film.afficheUrl)}
+              sizes="(max-width: 768px) 100vw, 240px"
+              alt={`Affiche de ${film.titre}`}
+              className="absolute inset-0 h-full w-full object-cover"
+              eager
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent md:bg-gradient-to-r" />
           </div>
 
@@ -89,7 +82,10 @@ export function FilmDialog({ film, onClose }: Props) {
           >
             <div>
               <p className="eyebrow">{film.genre}</p>
-              <h2 id="titre-film" className="mt-2 font-display text-3xl font-extrabold tracking-tight sm:text-4xl">
+              <h2
+                id="titre-film"
+                className="mt-2 font-display text-3xl font-extrabold tracking-tight sm:text-4xl"
+              >
                 {film.titre}
               </h2>
               <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium text-mist">
@@ -98,17 +94,17 @@ export function FilmDialog({ film, onClose }: Props) {
                   <ClockIcon className="h-4 w-4" />
                   {film.dureeMinutes} min
                 </span>
-                {media.data?.note ? (
+                {film.note ? (
                   <span className="inline-flex items-center gap-1.5 text-gold">
                     <StarIcon className="h-4 w-4" />
-                    {media.data.note.toFixed(1)} / 10
+                    {film.note.toFixed(1)} / 10
                   </span>
                 ) : null}
               </div>
             </div>
 
             <p className="max-w-prose text-sm leading-relaxed text-mist">
-              {media.data?.synopsis ?? "Synopsis indisponible pour le moment."}
+              {film.synopsis ?? "Synopsis indisponible pour le moment."}
             </p>
 
             <dl className="grid grid-cols-2 gap-3 text-xs sm:grid-cols-4">
@@ -118,7 +114,7 @@ export function FilmDialog({ film, onClose }: Props) {
                 { label: "Sortie", valeur: formatDateCourte(film.dateSortie) },
                 {
                   label: "Note",
-                  valeur: media.data?.note ? `${media.data.note.toFixed(1)} / 10` : "—",
+                  valeur: film.note ? `${film.note.toFixed(1)} / 10` : "—",
                 },
               ].map((element) => (
                 <div
@@ -134,13 +130,19 @@ export function FilmDialog({ film, onClose }: Props) {
             </dl>
 
             {bandeAnnonce && cle ? (
-              <div className="aspect-video w-full overflow-hidden rounded-2xl border border-white/10 bg-black">
+              <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-white/10 bg-black">
+                {!videoChargee ? (
+                  <div className="absolute inset-0 grid place-items-center text-xs uppercase tracking-[0.2em] text-mist">
+                    Chargement de la bande-annonce…
+                  </div>
+                ) : null}
                 <iframe
                   title={`Bande-annonce de ${film.titre}`}
                   src={`https://www.youtube-nocookie.com/embed/${cle}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
                   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
-                  className="h-full w-full"
+                  onLoad={() => setVideoChargee(true)}
+                  className="relative h-full w-full"
                 />
               </div>
             ) : null}
@@ -150,7 +152,12 @@ export function FilmDialog({ film, onClose }: Props) {
                 Voir les séances
               </GlassLink>
               {cle ? (
-                <GlassButton onClick={() => setBandeAnnonce((actif) => !actif)}>
+                <GlassButton
+                  onClick={() => {
+                    setVideoChargee(false);
+                    setBandeAnnonce((actif) => !actif);
+                  }}
+                >
                   <PlayIcon className="h-4 w-4" />
                   {bandeAnnonce ? "Masquer la bande-annonce" : "Bande-annonce"}
                 </GlassButton>

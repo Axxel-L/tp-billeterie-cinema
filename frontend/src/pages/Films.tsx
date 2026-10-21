@@ -1,17 +1,19 @@
-import { useQuery } from "@tanstack/react-query";
-import { useDeferredValue, useState, type CSSProperties } from "react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useDeferredValue, useEffect, useState, type CSSProperties } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { api } from "../api/client";
 import type { Film } from "../api/types";
 import { AnimatedList } from "../components/AnimatedList";
 import { FilmCard } from "../components/FilmCard";
 import { FilmDialog } from "../components/FilmDialog";
-import { CardSkeleton } from "../components/Skeleton";
+import { PageGate } from "../components/LoadingScreen";
+import { useImagesReady } from "../lib/useImagesReady";
 
 export default function Films() {
   const [titre, setTitre] = useState("");
   const [genre, setGenre] = useState("");
   const [selection, setSelection] = useState<Film | null>(null);
+  const [premierPassage, setPremierPassage] = useState(true);
   const titreDiffere = useDeferredValue(titre);
 
   const tous = useQuery({ queryKey: ["films", "tous"], queryFn: () => api.films() });
@@ -22,14 +24,30 @@ export default function Films() {
         titre: titreDiffere.trim() || undefined,
         genre: genre || undefined,
       }),
+    placeholderData: keepPreviousData,
   });
 
   const genres = [...new Set(tous.data?.map((film) => film.genre) ?? [])].sort((a, b) =>
     a.localeCompare(b, "fr"),
   );
 
+  const imagesPretes = useImagesReady(
+    liste.data?.slice(0, 12).map((film) => film.afficheUrl) ?? [],
+  );
+  const premierChargement = !liste.data && liste.isPending;
+
+  useEffect(() => {
+    if (!premierChargement && imagesPretes) {
+      setPremierPassage(false);
+    }
+  }, [premierChargement, imagesPretes]);
+
+  const chargement = premierPassage && (premierChargement || !imagesPretes);
+  const filmsAffiches = liste.data ?? [];
+
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 pb-24 pt-32 sm:px-6 lg:px-8">
+    <PageGate loading={chargement} label="Chargement du catalogue…">
+      <div className="mx-auto w-full max-w-7xl px-4 pb-24 pt-32 sm:px-6 lg:px-8">
       <header className="max-w-3xl">
         <p className="eyebrow">Catalogue</p>
         <h1 className="mt-4 font-display text-5xl font-black tracking-[-0.04em] sm:text-6xl">
@@ -77,25 +95,18 @@ export default function Films() {
         </div>
       </div>
 
-      {liste.isPending ? (
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          <CardSkeleton />
-          <CardSkeleton />
-          <CardSkeleton />
-          <CardSkeleton />
-        </div>
-      ) : liste.isError ? (
+      {liste.isError ? (
         <p className="mt-10 rounded-2xl border border-brand/30 bg-brand/10 p-5 text-sm text-brand-2" role="alert">
           Impossible de charger les films pour le moment.
         </p>
-      ) : liste.data.length === 0 ? (
+      ) : filmsAffiches.length === 0 ? (
         <div className="surface mt-10 p-10 text-center">
           <p className="font-display text-xl font-bold">Aucun film ne correspond.</p>
           <p className="mt-2 text-sm text-mist">Essayez un autre titre ou retirez le filtre de genre.</p>
         </div>
       ) : (
         <AnimatedList className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {liste.data.map((film, index) => (
+          {filmsAffiches.map((film, index) => (
             <div key={film.id} data-animate style={{ "--delay": `${index * 50}ms` } as CSSProperties}>
               <FilmCard film={film} index={index} onOuvrir={setSelection} />
             </div>
@@ -104,6 +115,7 @@ export default function Films() {
       )}
 
       {selection ? <FilmDialog film={selection} onClose={() => setSelection(null)} /> : null}
-    </div>
+      </div>
+    </PageGate>
   );
 }

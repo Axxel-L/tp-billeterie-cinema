@@ -1,17 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState, type CSSProperties } from "react";
 import { ArrowRightIcon, CalendarDaysIcon, TicketIcon } from "@heroicons/react/24/outline";
+import { PlayIcon } from "@heroicons/react/24/solid";
 import { api } from "../api/client";
 import type { Film } from "../api/types";
 import { AnimatedList } from "../components/AnimatedList";
 import { CountUp } from "../components/CountUp";
 import { FilmCard } from "../components/FilmCard";
 import { FilmDialog } from "../components/FilmDialog";
-import { GlassPanel } from "../components/Glass";
+import { GlassButton, GlassPanel } from "../components/Glass";
 import { GlassLink } from "../components/GlassLink";
 import { HeroMedia } from "../components/HeroMedia";
-import { CardSkeleton, Skeleton } from "../components/Skeleton";
+import { PageGate } from "../components/LoadingScreen";
+import { SmartImage, tmdbSrcSet } from "../components/SmartImage";
 import { formatHeure, formatJour, formatPrix, initiales, plageParDefaut } from "../lib/format";
+import { useImagesReady } from "../lib/useImagesReady";
 
 export default function Home() {
   const plage = useMemo(() => plageParDefaut(7), []);
@@ -25,20 +28,20 @@ export default function Home() {
 
   const prochaine = seances.data?.[0];
   const vedette = films.data?.find((film) => film.id === prochaine?.filmId) ?? films.data?.[0];
-
-  const media = useQuery({
-    queryKey: ["media", vedette?.id],
-    queryFn: () => api.filmMedia(vedette!.id),
-    enabled: Boolean(vedette),
-    staleTime: 60 * 60 * 1000,
-  });
+  const heroImage = (vedette?.bandeauUrl ?? vedette?.afficheUrl)?.replace("/w1280/", "/w780/");
+  const imagesPretes = useImagesReady([
+    heroImage,
+    ...(films.data?.slice(0, 6).map((film) => film.afficheUrl) ?? []),
+  ]);
+  const chargement = films.isPending || seances.isPending || !imagesPretes;
 
   const places = seances.data?.reduce((total, seance) => total + seance.placesRestantes, 0) ?? 0;
 
   return (
+    <PageGate loading={chargement} label="Chargement de la programmation…">
     <div>
-      <section className="relative isolate min-h-[100svh] overflow-hidden" data-lg-backdrop="#hero-media">
-        <HeroMedia media={media.data} titre={vedette?.titre ?? "Cinéma"} />
+      <section className="relative isolate min-h-[100svh] overflow-hidden">
+        <HeroMedia image={heroImage} titre={vedette?.titre ?? "Cinéma"} />
         <div className="hero-fade absolute inset-0" />
 
         <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-7xl flex-col justify-end px-4 pb-12 pt-40 sm:px-6 lg:px-8">
@@ -46,24 +49,22 @@ export default function Home() {
             <div className="pointer-events-none absolute right-6 top-28 hidden w-[300px] xl:block">
               <div className="absolute inset-0 translate-x-7 translate-y-7 rotate-6 rounded-[2rem] border border-white/10 bg-gradient-to-br from-brand/50 to-ink opacity-50" />
               <div className="relative aspect-[2/3] rotate-3 overflow-hidden rounded-[2rem] border border-white/20 shadow-[0_50px_140px_-30px_rgba(255,61,113,0.55)]">
-                {media.data?.afficheUrl ? (
-                  <img
-                    id="hero-poster"
-                    src={media.data.afficheUrl}
-                    alt={`Affiche de ${vedette.titre}`}
-                    className="h-full w-full object-cover"
-                    loading="eager"
-                  />
-                ) : (
-                  <div className="hero-ambient flex h-full w-full items-center justify-center">
-                    <span className="font-display text-7xl font-black tracking-tighter text-white/85">
-                      {initiales(vedette.titre)}
-                    </span>
-                  </div>
-                )}
+                <div className="hero-ambient absolute inset-0 flex items-center justify-center">
+                  <span className="font-display text-7xl font-black tracking-tighter text-white/85">
+                    {initiales(vedette.titre)}
+                  </span>
+                </div>
+                <SmartImage
+                  src={vedette.afficheUrl}
+                  srcSet={tmdbSrcSet(vedette.afficheUrl)}
+                  sizes="300px"
+                  alt={`Affiche de ${vedette.titre}`}
+                  className="absolute inset-0 h-full w-full object-cover"
+                  eager
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-transparent to-transparent" />
-                {media.data?.afficheUrl ? (
-                  <GlassPanel radius="18" backdrop="#hero-poster" className="absolute inset-x-3 bottom-3 p-3">
+                {vedette.afficheUrl ? (
+                  <GlassPanel radius="18" className="absolute inset-x-3 bottom-3 p-3">
                     <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-2">
                       {vedette.genre}
                     </p>
@@ -99,18 +100,19 @@ export default function Home() {
                 Explorer le catalogue
                 <ArrowRightIcon className="h-4 w-4" />
               </GlassLink>
+              {vedette?.bandeAnnonceCle ? (
+                <GlassButton onClick={() => setSelection(vedette)}>
+                  <PlayIcon className="h-4 w-4" />
+                  Bande-annonce
+                </GlassButton>
+              ) : null}
             </div>
           </div>
 
           <div className="mt-14 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-            <GlassPanel radius="26" backdrop="#hero-media" className="max-w-2xl p-5 sm:p-6">
+            <GlassPanel radius="26" className="max-w-2xl p-5 sm:p-6">
               <p className="eyebrow">Prochaine séance</p>
-              {seances.isPending ? (
-                <div className="mt-4 space-y-3">
-                  <Skeleton className="h-7 w-2/3" />
-                  <Skeleton className="h-4 w-1/2" />
-                </div>
-              ) : prochaine ? (
+              {prochaine ? (
                 <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
                   <div>
                     <h2 className="font-display text-2xl font-extrabold tracking-tight sm:text-3xl">
@@ -167,25 +169,17 @@ export default function Home() {
           <GlassLink to="/films">Tout le catalogue</GlassLink>
         </div>
 
-        {films.isPending ? (
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            <CardSkeleton />
-            <CardSkeleton />
-            <CardSkeleton />
-          </div>
-        ) : (
-          <AnimatedList className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {films.data?.slice(0, 6).map((film, index) => (
-              <div
-                key={film.id}
-                data-animate
-                style={{ "--delay": `${index * 70}ms` } as CSSProperties}
-              >
-                <FilmCard film={film} index={index} onOuvrir={setSelection} />
-              </div>
-            ))}
-          </AnimatedList>
-        )}
+        <AnimatedList className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {films.data?.slice(0, 6).map((film, index) => (
+            <div
+              key={film.id}
+              data-animate
+              style={{ "--delay": `${index * 70}ms` } as CSSProperties}
+            >
+              <FilmCard film={film} index={index} onOuvrir={setSelection} />
+            </div>
+          ))}
+        </AnimatedList>
       </section>
 
       <section className="mx-auto w-full max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
@@ -201,9 +195,7 @@ export default function Home() {
           </div>
 
           <div className="mt-6 divide-y divide-white/10">
-            {seances.isPending
-              ? [0, 1, 2].map((cle) => <Skeleton key={cle} className="my-3 h-16" />)
-              : seances.data?.slice(0, 5).map((seance) => (
+            {seances.data?.slice(0, 5).map((seance) => (
                   <div
                     key={seance.id}
                     className="flex flex-wrap items-center gap-4 py-4 transition hover:bg-white/[0.02]"
@@ -246,5 +238,6 @@ export default function Home() {
 
       {selection ? <FilmDialog film={selection} onClose={() => setSelection(null)} /> : null}
     </div>
+    </PageGate>
   );
 }

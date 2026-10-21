@@ -1,10 +1,10 @@
 import { lazy, Suspense, useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
-import { GradientBackground } from "./components/GradientBackground";
 import { GlassLink } from "./components/GlassLink";
+import { GridScan } from "./components/GridScan";
+import { LoadingScreen } from "./components/LoadingScreen";
 import { Logo } from "./components/Logo";
 import { Navigation } from "./components/Navigation";
-import { PageSkeleton } from "./components/Skeleton";
 
 const Home = lazy(() => import("./pages/Home"));
 const Films = lazy(() => import("./pages/Films"));
@@ -50,12 +50,12 @@ export default function App() {
         Aller au contenu
       </a>
 
-      <GradientBackground />
+      <GridScan />
 
       <div className="relative z-10 flex min-h-screen flex-col">
         <Navigation />
         <main id="contenu" className="flex-1">
-          <Suspense fallback={<PageSkeleton />}>
+          <Suspense fallback={<LoadingScreen label="Chargement de la page…" />}>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/films" element={<Films />} />
@@ -67,7 +67,7 @@ export default function App() {
           </Suspense>
         </main>
 
-        <footer className="border-t border-white/10 bg-ink/40 backdrop-blur-xl">
+        <footer className="border-t border-white/10 bg-ink/80">
           <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-6 px-4 py-8 sm:px-6 lg:px-8">
             <div className="flex items-center gap-3">
               <Logo className="h-9 w-9" />

@@ -51,7 +51,7 @@ export function LoginDialog({ open, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-ink/80 p-4 backdrop-blur-md"
+      className="fixed inset-0 z-50 grid place-items-center bg-ink/85 p-4"
       role="presentation"
       onMouseDown={onClose}
     >

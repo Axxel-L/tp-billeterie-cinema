@@ -1,21 +1,39 @@
-import type { ComponentPropsWithoutRef, MouseEventHandler, ReactNode } from "react";
+import type {
+  ComponentPropsWithoutRef,
+  CSSProperties,
+  MouseEventHandler,
+  ReactNode,
+} from "react";
+import { Link } from "react-router-dom";
 
 type PanelProps = ComponentPropsWithoutRef<"div"> & {
   radius?: string | number;
   tone?: "clear" | "light";
-  backdrop?: string;
 };
 
-/**
- * Enveloppe structurelle : un seul enfant stable est exposé au custom element.
- * Les elements liquid glass deplacent leurs enfants dans un noeud interne ;
- * sans cet enfant unique, React tenterait de retirer des noeuds deplaces.
- */
-export function GlassPanel({ radius, tone, backdrop, className, children, ...rest }: PanelProps) {
+export function GlassPanel({
+  radius = 22,
+  tone = "clear",
+  className,
+  style,
+  children,
+  ...rest
+}: PanelProps) {
+  const variables = {
+    ...style,
+    borderRadius: typeof radius === "number" ? `${radius}px` : radius,
+  } as CSSProperties;
+
   return (
-    <lg-panel radius={radius} tone={tone} backdrop={backdrop} className={className} {...rest}>
-      <div className="contents">{children}</div>
-    </lg-panel>
+    <div
+      className={`glass-panel${tone === "light" ? " glass-panel--light" : ""}${
+        className ? ` ${className}` : ""
+      }`}
+      style={variables}
+      {...rest}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -32,25 +50,38 @@ interface ButtonProps {
 
 export function GlassButton({
   children,
-  tone,
-  type,
+  tone = "clear",
+  type = "button",
   disabled,
   onClick,
   href,
   className,
   ariaLabel,
 }: ButtonProps) {
+  const classes = `glass-button glass-button--${tone}${className ? ` ${className}` : ""}`;
+
+  if (href) {
+    return (
+      <Link
+        to={href}
+        className={classes}
+        aria-label={ariaLabel}
+        onClick={onClick as unknown as MouseEventHandler<HTMLAnchorElement>}
+      >
+        {children}
+      </Link>
+    );
+  }
+
   return (
-    <lg-button
-      tone={tone}
+    <button
       type={type}
-      disabled={disabled}
+      className={classes}
       onClick={onClick}
-      href={href}
-      className={className}
+      disabled={disabled}
       aria-label={ariaLabel}
     >
-      <span className="contents">{children}</span>
-    </lg-button>
+      {children}
+    </button>
   );
 }
