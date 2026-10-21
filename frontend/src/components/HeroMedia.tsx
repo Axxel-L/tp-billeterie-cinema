@@ -46,7 +46,7 @@ export function HeroMedia({ media, titre }: Props) {
       {video && cle ? (
         <iframe
           title={`Bande-annonce de ${titre}`}
-          src={`https://www.youtube-nocookie.com/embed/${cle}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cle}&playsinline=1&modestbranding=1&rel=0&iv_load_policy=3`}
+          src={`https://www.youtube-nocookie.com/embed/${cle}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cle}&playsinline=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&fs=0`}
           allow="autoplay; encrypted-media; picture-in-picture"
           tabIndex={-1}
           aria-hidden="true"

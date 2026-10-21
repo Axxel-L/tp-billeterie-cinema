@@ -1,11 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
-import { FilmIcon, BuildingOffice2Icon, CalendarDaysIcon } from "@heroicons/react/24/outline";
+import {
+  BuildingOffice2Icon,
+  CalendarDaysIcon,
+  FilmIcon,
+  MagnifyingGlassIcon,
+  PlusIcon,
+} from "@heroicons/react/24/outline";
 import { api, ApiException } from "../api/client";
+import type { FilmRecherche } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import { GlassButton, GlassPanel } from "../components/Glass";
 import { Skeleton } from "../components/Skeleton";
-import { dateLocale, formatHeure, formatJour } from "../lib/format";
+import { formatHeure, formatJour, initiales } from "../lib/format";
 
 type Onglet = "film" | "seance" | "salle";
 type Retour = { ton: "ok" | "erreur"; texte: string } | null;
@@ -64,9 +71,9 @@ export default function Admin() {
         <h1 className="mt-4 font-display text-5xl font-black tracking-[-0.04em] sm:text-6xl">
           Pilotage
         </h1>
-        <p className="mt-4 text-base leading-relaxed text-mist">
-          Créez les films, les séances et les salles. Les formulaires suivent exactement les règles
-          de validation du serveur.
+        <p className="mt-4 text-base leading-relaxed text-white/70">
+          Les films sont ajoutés depuis le catalogue TMDB : seules de vraies fiches peuvent
+          entrer en base. Les séances et les salles restent saisies à la main.
         </p>
       </header>
 
@@ -91,8 +98,8 @@ export default function Admin() {
           })}
       </div>
 
-      <div className="mt-6 max-w-2xl">
-        {onglet === "film" ? <FormulaireFilm /> : null}
+      <div className="mt-6 max-w-3xl">
+        {onglet === "film" ? <RechercheFilm /> : null}
         {onglet === "seance" ? <FormulaireSeance /> : null}
         {onglet === "salle" && estAdmin ? <FormulaireSalle /> : null}
       </div>
@@ -100,85 +107,166 @@ export default function Admin() {
   );
 }
 
-function FormulaireFilm() {
+function RechercheFilm() {
   const clientRequetes = useQueryClient();
-  const [titre, setTitre] = useState("");
-  const [genre, setGenre] = useState("");
-  const [duree, setDuree] = useState(120);
-  const [dateSortie, setDateSortie] = useState(dateLocale(new Date()));
+  const [saisie, setSaisie] = useState("");
+  const [requete, setRequete] = useState("");
   const [retour, setRetour] = useState<Retour>(null);
 
-  const creation = useMutation({
-    mutationFn: api.creerFilm,
-    onSuccess: (film) => {
-      setRetour({ ton: "ok", texte: `« ${film.titre} » ajouté (id ${film.id}).` });
-      setTitre("");
-      setGenre("");
-      void clientRequetes.invalidateQueries({ queryKey: ["films"] });
-    },
-    onError: (cause) => setRetour(messageErreur(cause, "Création du film impossible.")),
+  const resultats = useQuery({
+    queryKey: ["recherche-films", requete],
+    queryFn: () => api.rechercherFilms(requete),
+    enabled: requete.length >= 2,
+    retry: false,
   });
 
-  function soumettre(evenement: FormEvent) {
+  const ajout = useMutation({
+    mutationFn: api.creerFilmDepuisTmdb,
+    onSuccess: (film) => {
+      setRetour({ ton: "ok", texte: `« ${film.titre} » ajouté (id ${film.id}).` });
+      void clientRequetes.invalidateQueries({ queryKey: ["films"] });
+    },
+    onError: (cause) => setRetour(messageErreur(cause, "Ajout du film impossible.")),
+  });
+
+  function chercher(evenement: FormEvent) {
     evenement.preventDefault();
+    const propre = saisie.trim();
+    if (propre.length < 2) {
+      setRetour({ ton: "erreur", texte: "Saisissez au moins deux caractères." });
+      return;
+    }
     setRetour(null);
-    creation.mutate({ titre, genre, dureeMinutes: duree, dateSortie });
+    setRequete(propre);
   }
+
+  const erreur = resultats.error instanceof ApiException ? resultats.error : null;
 
   return (
     <GlassPanel radius="26" className="p-6 sm:p-7">
-      <h2 className="font-display text-xl font-extrabold tracking-tight">Nouveau film</h2>
-      <form className="mt-5 space-y-4" onSubmit={soumettre}>
-        <label className="block">
-          <span className="field-label">Titre</span>
+      <h2 className="font-display text-xl font-extrabold tracking-tight">Ajouter un film</h2>
+      <p className="mt-1 text-sm text-mist">
+        Recherche dans TMDB, puis import des métadonnées et du visuel par le serveur.
+      </p>
+
+      <form className="mt-5 flex flex-wrap items-end gap-3" onSubmit={chercher}>
+        <label className="block min-w-56 flex-1">
+          <span className="field-label">Titre du film</span>
           <input
             className="input"
-            value={titre}
-            onChange={(evenement) => setTitre(evenement.target.value)}
+            value={saisie}
+            onChange={(evenement) => setSaisie(evenement.target.value)}
+            placeholder="Dune, Parasite, Interstellar…"
             required
-            maxLength={200}
           />
         </label>
-        <label className="block">
-          <span className="field-label">Genre</span>
-          <input
-            className="input"
-            value={genre}
-            onChange={(evenement) => setGenre(evenement.target.value)}
-            required
-            maxLength={80}
-          />
-        </label>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="block">
-            <span className="field-label">Durée (min)</span>
-            <input
-              type="number"
-              className="input"
-              min={40}
-              max={300}
-              value={duree}
-              onChange={(evenement) => setDuree(Number(evenement.target.value))}
-              required
-            />
-          </label>
-          <label className="block">
-            <span className="field-label">Date de sortie</span>
-            <input
-              type="date"
-              className="input"
-              value={dateSortie}
-              onChange={(evenement) => setDateSortie(evenement.target.value)}
-              required
-            />
-          </label>
-        </div>
-        <RetourMessage retour={retour} />
-        <GlassButton type="submit" tone="tinted" disabled={creation.isPending}>
-          {creation.isPending ? "Création…" : "Créer le film"}
+        <GlassButton type="submit" tone="tinted">
+          <MagnifyingGlassIcon className="h-4 w-4" />
+          Rechercher
         </GlassButton>
       </form>
+
+      {erreur ? (
+        <p
+          className="mt-4 rounded-xl border border-gold/30 bg-gold/10 px-3 py-2 text-sm text-gold"
+          role="alert"
+        >
+          {erreur.status === 503
+            ? "TMDB n'est pas configuré : définissez TMDB_API_KEY puis redémarrez l'API."
+            : erreur.message}
+        </p>
+      ) : null}
+
+      {retour ? (
+        <p
+          className={`mt-4 rounded-xl border px-3 py-2 text-sm ${
+            retour.ton === "ok"
+              ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200"
+              : "border-brand/30 bg-brand/10 text-brand-2"
+          }`}
+          role={retour.ton === "erreur" ? "alert" : "status"}
+        >
+          {retour.texte}
+        </p>
+      ) : null}
+
+      {resultats.isFetching ? (
+        <div className="mt-5 space-y-3">
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-24 w-full" />
+        </div>
+      ) : null}
+
+      {resultats.data && resultats.data.length === 0 && !resultats.isFetching ? (
+        <p className="mt-5 text-sm text-mist">Aucun film trouvé pour « {requete} ».</p>
+      ) : null}
+
+      {resultats.data && resultats.data.length > 0 ? (
+        <ul className="mt-5 space-y-3">
+          {resultats.data.map((film) => (
+            <LigneResultat
+              key={film.tmdbId}
+              film={film}
+              enCours={ajout.isPending && ajout.variables === film.tmdbId}
+              onAjouter={() => {
+                setRetour(null);
+                ajout.mutate(film.tmdbId);
+              }}
+            />
+          ))}
+        </ul>
+      ) : null}
     </GlassPanel>
+  );
+}
+
+function LigneResultat({
+  film,
+  enCours,
+  onAjouter,
+}: {
+  film: FilmRecherche;
+  enCours: boolean;
+  onAjouter: () => void;
+}) {
+  return (
+    <li className="flex gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+      <div className="h-24 w-16 shrink-0 overflow-hidden rounded-xl bg-ink-2">
+        {film.afficheUrl ? (
+          <img
+            src={film.afficheUrl}
+            alt=""
+            loading="lazy"
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div className="hero-ambient flex h-full items-center justify-center text-sm font-bold text-white/80">
+            {initiales(film.titre)}
+          </div>
+        )}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="font-display text-base font-bold leading-tight">
+          {film.titre}
+          {film.annee ? <span className="ml-2 text-xs font-medium text-mist">{film.annee}</span> : null}
+        </p>
+        <p className="mt-1 line-clamp-2 text-xs text-mist">
+          {film.synopsis ?? "Synopsis indisponible."}
+        </p>
+      </div>
+      <div className="self-center">
+        <button
+          type="button"
+          className="chip"
+          onClick={onAjouter}
+          disabled={enCours}
+          aria-label={`Ajouter ${film.titre}`}
+        >
+          <PlusIcon className="h-4 w-4" />
+          {enCours ? "Ajout…" : "Ajouter"}
+        </button>
+      </div>
+    </li>
   );
 }
 
@@ -292,7 +380,18 @@ function FormulaireSeance() {
             />
           </label>
         </div>
-        <RetourMessage retour={retour} />
+        {retour ? (
+          <p
+            className={`rounded-xl border px-3 py-2 text-sm ${
+              retour.ton === "ok"
+                ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200"
+                : "border-brand/30 bg-brand/10 text-brand-2"
+            }`}
+            role={retour.ton === "erreur" ? "alert" : "status"}
+          >
+            {retour.texte}
+          </p>
+        ) : null}
         <GlassButton type="submit" tone="tinted" disabled={creation.isPending}>
           {creation.isPending ? "Création…" : "Créer la séance"}
         </GlassButton>
@@ -349,29 +448,22 @@ function FormulaireSalle() {
             required
           />
         </label>
-        <RetourMessage retour={retour} />
+        {retour ? (
+          <p
+            className={`rounded-xl border px-3 py-2 text-sm ${
+              retour.ton === "ok"
+                ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200"
+                : "border-brand/30 bg-brand/10 text-brand-2"
+            }`}
+            role={retour.ton === "erreur" ? "alert" : "status"}
+          >
+            {retour.texte}
+          </p>
+        ) : null}
         <GlassButton type="submit" tone="tinted" disabled={creation.isPending}>
           {creation.isPending ? "Création…" : "Créer la salle"}
         </GlassButton>
       </form>
     </GlassPanel>
-  );
-}
-
-function RetourMessage({ retour }: { retour: Retour }) {
-  if (!retour) {
-    return null;
-  }
-  return (
-    <p
-      className={`rounded-xl border px-3 py-2 text-sm ${
-        retour.ton === "ok"
-          ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200"
-          : "border-brand/30 bg-brand/10 text-brand-2"
-      }`}
-      role={retour.ton === "erreur" ? "alert" : "status"}
-    >
-      {retour.texte}
-    </p>
   );
 }

@@ -1,8 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState, type CSSProperties } from "react";
-import { CalendarDaysIcon, MapPinIcon } from "@heroicons/react/24/outline";
-import { api } from "../api/client";
+import { CalendarDaysIcon, MapPinIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { api, ApiException } from "../api/client";
 import type { Seance } from "../api/types";
+import { useAuth } from "../auth/AuthContext";
 import { AnimatedList } from "../components/AnimatedList";
 import { GlassPanel } from "../components/Glass";
 import { GlassLink } from "../components/GlassLink";
@@ -25,10 +26,37 @@ function grouperParJour(seances: Seance[]): [string, Seance[]][] {
 
 export default function Seances() {
   const [plage, setPlage] = useState(() => plageParDefaut(14));
+  const [confirmation, setConfirmation] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ ton: "ok" | "erreur"; texte: string } | null>(null);
+  const { session, hasRole } = useAuth();
+  const clientRequetes = useQueryClient();
+  const peutVoir = Boolean(session) && hasRole("CLIENT", "ADMIN");
 
   const requete = useQuery({
     queryKey: ["seances", plage.du, plage.au],
     queryFn: () => api.seances(plage),
+  });
+
+  const mesReservations = useQuery({
+    queryKey: ["mes-reservations"],
+    queryFn: api.mesReservations,
+    enabled: peutVoir,
+  });
+
+  const annulation = useMutation({
+    mutationFn: api.annuler,
+    onSuccess: (_resultat, code) => {
+      setConfirmation(null);
+      setMessage({ ton: "ok", texte: `Réservation ${code} annulée, les places sont libérées.` });
+      void clientRequetes.invalidateQueries({ queryKey: ["mes-reservations"] });
+      void clientRequetes.invalidateQueries({ queryKey: ["seances"] });
+    },
+    onError: (erreur) => {
+      setMessage({
+        ton: "erreur",
+        texte: erreur instanceof ApiException ? erreur.message : "Annulation impossible.",
+      });
+    },
   });
 
   const groupes = useMemo(() => grouperParJour(requete.data ?? []), [requete.data]);
@@ -40,11 +68,102 @@ export default function Seances() {
         <h1 className="mt-4 font-display text-5xl font-black tracking-[-0.04em] sm:text-6xl">
           Séances
         </h1>
-        <p className="mt-4 text-base leading-relaxed text-mist">
+        <p className="mt-4 text-base leading-relaxed text-white/70">
           Les places restantes sont calculées à partir des réservations confirmées, jamais d'un
           compteur local.
         </p>
       </header>
+
+      {peutVoir ? (
+        <section className="mt-8">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="eyebrow">Votre compte</p>
+              <h2 className="mt-2 font-display text-3xl font-extrabold tracking-tight">
+                Mes réservations
+              </h2>
+            </div>
+            <span className="text-xs text-mist">
+              {mesReservations.data?.length ?? 0} à venir
+            </span>
+          </div>
+
+          {message ? (
+            <p
+              className={`mt-4 rounded-xl border px-3 py-2 text-sm ${
+                message.ton === "ok"
+                  ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200"
+                  : "border-brand/30 bg-brand/10 text-brand-2"
+              }`}
+              role={message.ton === "erreur" ? "alert" : "status"}
+            >
+              {message.texte}
+            </p>
+          ) : null}
+
+          {mesReservations.isPending ? (
+            <Skeleton className="mt-4 h-24 w-full" />
+          ) : mesReservations.data && mesReservations.data.length > 0 ? (
+            <div className="mt-4 space-y-3">
+              {mesReservations.data.map((reservation) => (
+                <div
+                  key={reservation.code}
+                  className="surface flex flex-wrap items-center gap-4 p-4"
+                >
+                  <div className="min-w-56 flex-1">
+                    <p className="font-display text-lg font-bold tracking-tight">
+                      {reservation.filmTitre}
+                    </p>
+                    <p className="mt-1 text-xs text-mist">
+                      {formatJour(reservation.debut)} · {formatHeure(reservation.debut)} ·{" "}
+                      {reservation.salleNom} · {reservation.nombrePlaces} place(s)
+                    </p>
+                  </div>
+                  <code className="code">{reservation.code}</code>
+                  <span className="text-sm font-semibold text-gold">
+                    {formatPrix(reservation.montantTotal)}
+                  </span>
+                  {confirmation === reservation.code ? (
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        className="chip"
+                        onClick={() => annulation.mutate(reservation.code)}
+                        disabled={annulation.isPending}
+                      >
+                        Confirmer
+                      </button>
+                      <button
+                        type="button"
+                        className="chip"
+                        onClick={() => setConfirmation(null)}
+                      >
+                        Garder
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      className="chip"
+                      onClick={() => {
+                        setConfirmation(reservation.code);
+                        setMessage(null);
+                      }}
+                    >
+                      <TrashIcon className="h-4 w-4" />
+                      Annuler
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-mist">
+              Aucune réservation à venir. Choisissez une séance ci-dessous.
+            </p>
+          )}
+        </section>
+      ) : null}
 
       <GlassPanel radius="22" className="mt-8 block">
         <div className="flex flex-wrap items-end gap-4 p-5">

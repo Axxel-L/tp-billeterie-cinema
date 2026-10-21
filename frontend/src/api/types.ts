@@ -16,6 +16,24 @@ export interface FilmMedia {
   note?: number;
 }
 
+export interface FilmRecherche {
+  tmdbId: number;
+  titre: string;
+  annee?: number;
+  afficheUrl?: string;
+  synopsis?: string;
+}
+
+export interface ReservationClient {
+  code: string;
+  filmTitre: string;
+  salleNom: string;
+  debut: string;
+  nombrePlaces: number;
+  montantTotal: number;
+  statut: StatutReservation;
+}
+
 export interface Seance {
   id: number;
   filmId: number;

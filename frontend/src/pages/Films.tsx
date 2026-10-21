@@ -35,7 +35,7 @@ export default function Films() {
         <h1 className="mt-4 font-display text-5xl font-black tracking-[-0.04em] sm:text-6xl">
           Films
         </h1>
-        <p className="mt-4 text-base leading-relaxed text-mist">
+        <p className="mt-4 text-base leading-relaxed text-white/70">
           {tous.data?.length ?? 0} films programmés. Filtrez par titre ou par genre : la recherche
           est faite côté serveur, pas dans le navigateur.
         </p>

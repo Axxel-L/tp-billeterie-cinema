@@ -3,8 +3,10 @@ import type {
   Film,
   FilmMedia,
   FilmPayload,
+  FilmRecherche,
   Me,
   Reservation,
+  ReservationClient,
   ReservationPayload,
   Salle,
   SallePayload,
@@ -103,6 +105,15 @@ export const api = {
 
   filmMedia: (id: number) => request<FilmMedia>(`/api/films/${id}/media`),
 
+  rechercherFilms: (titre: string) =>
+    request<FilmRecherche[]>(`/api/programmation/films/recherche${query({ titre })}`),
+
+  creerFilmDepuisTmdb: (tmdbId: number) =>
+    request<Film>("/api/programmation/films/depuis-tmdb", {
+      method: "POST",
+      body: JSON.stringify({ tmdbId }),
+    }),
+
   seances: (params: { du: string; au: string }) =>
     request<Seance[]>(`/api/seances${query(params)}`),
 
@@ -118,6 +129,8 @@ export const api = {
     request<void>(`/api/reservations/${encodeURIComponent(code)}`, {
       method: "DELETE",
     }),
+
+  mesReservations: () => request<ReservationClient[]>("/api/reservations/mes-reservations"),
 
   creerFilm: (payload: FilmPayload) =>
     request<Film>("/api/programmation/films", {

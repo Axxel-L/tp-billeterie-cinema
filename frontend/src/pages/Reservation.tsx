@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router-dom";
 import { CheckCircleIcon, TicketIcon, XCircleIcon } from "@heroicons/react/24/outline";
@@ -12,6 +12,7 @@ import { formatHeure, formatJour, formatPrix, plageParDefaut } from "../lib/form
 export default function ReservationPage() {
   const [parametres] = useSearchParams();
   const { session, openLogin } = useAuth();
+  const clientRequetes = useQueryClient();
   const seanceInitiale = Number(parametres.get("seance")) || null;
 
   const [seanceId, setSeanceId] = useState<number | null>(seanceInitiale);
@@ -43,6 +44,7 @@ export default function ReservationPage() {
       setMessage({ ton: "ok", texte: "Réservation confirmée. Conservez votre code." });
       setPlaces(1);
       void seances.refetch();
+      void clientRequetes.invalidateQueries({ queryKey: ["mes-reservations"] });
     },
     onError: (erreur) => {
       setMessage({
@@ -62,6 +64,7 @@ export default function ReservationPage() {
       setCodeAnnulation("");
       setTicket(null);
       void seances.refetch();
+      void clientRequetes.invalidateQueries({ queryKey: ["mes-reservations"] });
     },
     onError: (erreur) => {
       setMessage({
@@ -106,7 +109,7 @@ export default function ReservationPage() {
         <h1 className="mt-4 font-display text-5xl font-black tracking-[-0.04em] sm:text-6xl">
           Réserver
         </h1>
-        <p className="mt-4 text-base leading-relaxed text-mist">
+        <p className="mt-4 text-base leading-relaxed text-white/70">
           Le code et le montant sont calculés par le serveur. Une réservation ne peut jamais
           dépasser la capacité de la salle, même en cas de demandes simultanées.
         </p>
