@@ -180,16 +180,22 @@ Optional<Seance> findByIdForUpdate(Long id);
 
 `ReservationService.creer` est annoté `@Transactional(isolation = READ_COMMITTED)` :
 
-1. Charger la séance avec `SELECT … FOR UPDATE` (404 si absente).2. Calculer la somme des places `CONFIRMEE` pour cette séance.3. Si `somme + demandées > capacité`, lever `CapaciteInsuffisanteException` (409) **avant**
-   toute écriture.4. Sinon générer un code `RES-` + 12 caractères Crockford Base32 (`SecureRandom`), insérer et
+1. Charger la séance avec `SELECT … FOR UPDATE` (404 si absente).
+2. Calculer la somme des places `CONFIRMEE` pour cette séance.
+3. Si `somme + demandées > capacité`, lever `CapaciteInsuffisanteException` (409) **avant**
+   toute écriture.
+4. Sinon générer un code `RES-` + 12 caractères Crockford Base32 (`SecureRandom`), insérer et
    retourner le montant calculé.
 
 Pourquoi ces choix :
 
-- le verrou est **dans MySQL** : il protège plusieurs threads et plusieurs instances.- `READ_COMMITTED` est explicite : en `REPEATABLE READ` (défaut MySQL), la lecture de la somme
+- le verrou est **dans MySQL** : il protège plusieurs threads et plusieurs instances.
+- `READ_COMMITTED` est explicite : en `REPEATABLE READ` (défaut MySQL), la lecture de la somme
   pourrait utiliser un snapshot antérieur au commit concurrent et laisser passer une
-  surréservation.- l'annulation ne prend pas le verrou de séance : elle ne peut que **libérer** de la capacité,
-  donc elle ne peut pas violer l'invariant. Elle est idempotente.- alternative écartée : `@Version` + retry (non déterministe, test plus fragile) et compteur
+  surréservation.
+- l'annulation ne prend pas le verrou de séance : elle ne peut que **libérer** de la capacité,
+  donc elle ne peut pas violer l'invariant. Elle est idempotente.
+- alternative écartée : `@Version` + retry (non déterministe, test plus fragile) et compteur
   `places_restantes` dénormalisé (hors du modèle imposé).
 
 ```mermaid
@@ -265,7 +271,9 @@ clé TMDB.
 
 L'ajout d'un film passe par TMDB :
 
-1. `GET /api/programmation/films/recherche?titre=` cherche des films réels.2. L'administrateur sélectionne un résultat.3. `POST /api/programmation/films/depuis-tmdb` recharge la fiche **côté serveur** et stocke
+1. `GET /api/programmation/films/recherche?titre=` cherche des films réels.
+2. L'administrateur sélectionne un résultat.
+3. `POST /api/programmation/films/depuis-tmdb` recharge la fiche **côté serveur** et stocke
    les métadonnées et médias.
 
 Il est donc impossible d'inventer un film depuis le navigateur. Sans clé, la recherche renvoie
@@ -314,7 +322,9 @@ ignorés et les autres restent verts.
 
 `.github/workflows/ci.yml` s'exécute sur chaque push et pull request :
 
-1. **backend** : JDK 25, `./mvnw clean verify`, rapports Surefire, JAR.2. **frontend** : Bun, `bun install --frozen-lockfile`, `bun run typecheck`, `bun run build`.3. **deploy** (main uniquement) : image Docker multi-stage (Bun → Maven → JRE 25) publiée sur
+1. **backend** : JDK 25, `./mvnw clean verify`, rapports Surefire, JAR.
+2. **frontend** : Bun, `bun install --frozen-lockfile`, `bun run typecheck`, `bun run build`.
+3. **deploy** (main uniquement) : image Docker multi-stage (Bun → Maven → JRE 25) publiée sur
    GHCR avec les tags `latest` et SHA.
 
 Le build Maven ne dépend jamais de Node/Bun. Le `Dockerfile` compile la SPA et le JAR dans des
@@ -377,7 +387,11 @@ frontend soigné et performant.
 
 Pistes d'amélioration :
 
-- idempotence de la réservation par `Idempotency-Key` (bonus).- `ETag` sur les fiches films et métriques Micrometer.- pagination du catalogue et recherche avancée.- audit d'accessibilité complet et tests E2E Playwright dans la CI.- déploiement automatisé sur un environnement de recette (pas seulement l'image GHCR).
+- idempotence de la réservation par `Idempotency-Key` (bonus).
+- `ETag` sur les fiches films et métriques Micrometer.
+- pagination du catalogue et recherche avancée.
+- audit d'accessibilité complet et tests E2E Playwright dans la CI.
+- déploiement automatisé sur un environnement de recette (pas seulement l'image GHCR).
 
 ## 14. Utilisation de l'IA
 
