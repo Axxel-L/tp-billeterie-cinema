@@ -36,6 +36,23 @@ Sans Docker, les tests Testcontainers sont ignorés (`@Testcontainers(disabledWi
 et les autres restent verts : `clean verify` passe, mais la couverture MySQL n'est alors
 pas exercée. C'est la limitation prévue par le sujet.
 
+## Configuration (.env)
+
+Spring Boot importe automatiquement le fichier `./.env` grâce à
+`spring.config.import` : aucune dépendance supplémentaire, aucun script de lancement.
+
+```bash
+cp .env.example .env
+# éditer .env : TMDB_API_KEY=...
+./mvnw spring-boot:run
+```
+
+- `.env` est ignoré par Git ; seul `.env.example` est versionné.
+- Une variable exportée dans le shell reste prioritaire sur `.env`.
+- La clé est lue au démarrage : redémarrer l'application après modification.
+- Elle ne sert qu'à la recherche/import de nouveaux films ; les 6 films de démo ont
+  déjà leurs médias en base.
+
 ## Comptes de démonstration
 
 | Identifiant | Mot de passe | Rôle | Droits |

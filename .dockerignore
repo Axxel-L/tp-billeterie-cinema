@@ -7,3 +7,6 @@ frontend/dist
 src/main/resources/static
 *.log
 .DS_Store
+
+.env
+.env.*

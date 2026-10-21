@@ -22,6 +22,7 @@ Redis, Kafka, JWT, paiement). Les versions gérées par le parent ne se répète
 
 ```bash
 docker compose up -d                 # MySQL local (8.4)
+cp .env.example .env                 # TMDB_API_KEY=... (ignoré par Git)
 ./mvnw clean verify                  # build + tests : la référence
 ./mvnw spring-boot:run               # API sur :8080
 java -jar target/billetterie-cinema-1.0.0.jar
@@ -32,6 +33,9 @@ bun run dev                          # Vite :5173, proxy /api -> :8080
 bun run typecheck
 bun run build                        # build vers src/main/resources/static
 ```
+
+`application.yml` importe `./.env` (`spring.config.import`) ; ne jamais committer `.env`.
+Une variable d'environnement exportée reste prioritaire.
 
 Le backend utilise Maven et le frontend **Bun** exclusivement (installation,
 scripts, build). Ne pas régénérer `package-lock.json`.
