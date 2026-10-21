@@ -1,0 +1,9 @@
+target
+.git
+.github
+.kilo
+frontend/node_modules
+frontend/dist
+src/main/resources/static
+*.log
+.DS_Store
