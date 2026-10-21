@@ -195,5 +195,7 @@ Capture d'écran de la conversation avec Deepseek:
 ![image6](https://media.discordapp.net/attachments/1290388444715159643/1562465282491031562/image.png?ex=6ada16b0&is=6ad8c530&hm=0a5116b8686d593ca33c54aa5484737da2b1809efd276581caeaf63a188ea7ef&=&format=webp&quality=lossless&width=1024&height=613)
 ![image7](https://media.discordapp.net/attachments/1290388444715159643/1562465282906136636/image.png?ex=6ada16b0&is=6ad8c530&hm=19f6d78ee1701d5a89809baaedcd631c4c22de149d98ca74ab16f69fb168f3e2&=&format=webp&quality=lossless&width=1024&height=613)
 ![image8](https://media.discordapp.net/attachments/1290388444715159643/1562465283241803877/image.png?ex=6ada16b0&is=6ad8c530&hm=8c8527af4181127df0461b96ff618ddc027ae9d98025539cc74eb8724461df36&=&format=webp&quality=lossless&width=1024&height=613)
+![image9](https://media.discordapp.net/attachments/1290388444715159643/1562476964835762307/image.png?ex=6ada2191&is=6ad8d011&hm=46aefb8454696ab6dc801729527b91a92f9fa07ef5c182e535d34f89f81a0584&=&format=webp&quality=lossless&width=1024&height=613)
+![image10](https://media.discordapp.net/attachments/1290388444715159643/1562476965200531506/image.png?ex=6ada2191&is=6ad8d011&hm=3e1bf9a737d47d434eee66bffd17b3de6af719b95d4bdc9d3c685bae61a53ebc&=&format=webp&quality=lossless&width=1024&height=613)
 
 Pour les animations de fond = https://reactbits.dev 
