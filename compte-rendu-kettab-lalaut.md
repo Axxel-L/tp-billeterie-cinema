@@ -357,7 +357,7 @@ Conformément aux règles de transparence :
 
 Captures de la conversation (liens externes, susceptibles d'expirer) :
 
-![image](https://media.discordapp.net/attachments/1290388444715159643/1562465280469246022/image.png?ex=6ada16b0&is=6ad8c530&hm=7a3f211dd653d188486d1d95bcbb56628931f0f0aea9b5dbb0294a64b999ddb3b&=&format=webp&quality=lossless&width=1024&height=613)
+![image](https://media.discordapp.net/attachments/1290388444715159643/1562465280469246022/image.png?ex=6ada16b0&is=6ad8c530&hm=7a3f211dd653d188486d1d95bcbb56628931f0f0aea9b5dbb0294a64b999ddb3&=&format=webp&quality=lossless&width=1024&height=613)
 ![image2](https://media.discordapp.net/attachments/1290388444715159643/1562465280876216342/image.png?ex=6ada16b0&is=6ad8c530&hm=ff40878617fb396d678ab1d595f6cdd82a1687f3742a77e8481ba04c41e66e1b&=&format=webp&quality=lossless&width=1024&height=613)
 ![image3](https://media.discordapp.net/attachments/1290388444715159643/1562465281215828140/image.png?ex=6ada16b0&is=6ad8c530&hm=e4f724da7088558d3cf5d2d44bbe2a68dea1906a316528442436091b798073eb&=&format=webp&quality=lossless&width=1280&height=238)
 ![image4](https://media.discordapp.net/attachments/1290388444715159643/1562465281639456870/image.png?ex=6ada16b0&is=6ad8c530&hm=4bf2ff0710a8fbb5ba87cc6426f9de0837d01e74835900f3deded8d2d2e58046&=&format=webp&quality=lossless&width=1280&height=183)
