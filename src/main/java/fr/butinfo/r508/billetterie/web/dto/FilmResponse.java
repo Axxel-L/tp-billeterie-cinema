@@ -12,6 +12,7 @@ public record FilmResponse(
         LocalDate dateSortie,
         String afficheUrl,
         String bandeauUrl,
+        String bandeAnnonceSite,
         String bandeAnnonceCle,
         String synopsis,
         Double note
@@ -25,6 +26,7 @@ public record FilmResponse(
                 film.getDateSortie(),
                 film.getAfficheUrl(),
                 film.getBandeauUrl(),
+                film.getBandeAnnonceSite(),
                 film.getBandeAnnonceCle(),
                 film.getSynopsis(),
                 film.getNote() == null ? null : film.getNote().doubleValue());

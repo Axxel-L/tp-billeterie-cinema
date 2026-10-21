@@ -17,6 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -42,9 +43,14 @@ public class MediaService {
 
     public FilmMediaResponse pourFilm(Film film) {
         if (film.getAfficheUrl() != null || film.getBandeAnnonceCle() != null) {
+            String site = film.getBandeAnnonceSite();
+            if (site == null && film.getBandeAnnonceCle() != null) {
+                site = "YouTube";
+            }
             return new FilmMediaResponse(
                     film.getAfficheUrl(),
                     film.getBandeauUrl(),
+                    site,
                     film.getBandeAnnonceCle(),
                     film.getSynopsis(),
                     film.getNote() == null ? null : film.getNote().doubleValue());
@@ -134,7 +140,8 @@ public class MediaService {
         FilmMediaResponse media = new FilmMediaResponse(
                 image(fiche.posterPath(), "w500"),
                 image(fiche.backdropPath(), "w1280"),
-                choisirBandeAnnonce(fiche.videos()),
+                videoSite(fiche.videos()),
+                videoCle(fiche.videos()),
                 texte(fiche.overview()),
                 fiche.voteAverage());
 
@@ -187,7 +194,8 @@ public class MediaService {
         return new FilmMediaResponse(
                 image(fiche.posterPath(), "w500"),
                 image(fiche.backdropPath(), "w1280"),
-                choisirBandeAnnonce(fiche.videos()),
+                videoSite(fiche.videos()),
+                videoCle(fiche.videos()),
                 texte(fiche.overview()),
                 fiche.voteAverage());
     }
@@ -219,25 +227,41 @@ public class MediaService {
         return imageBaseUrl + "/" + taille + chemin;
     }
 
-    private String choisirBandeAnnonce(TmdbVideos videos) {
+    private VideoChoisie choisirVideo(TmdbVideos videos) {
         if (videos == null || videos.results() == null) {
             return null;
         }
         return videos.results().stream()
-                .filter(video -> "YouTube".equalsIgnoreCase(video.site()))
+                .filter(video -> video.site() != null && !video.site().isBlank())
                 .filter(video -> video.key() != null && !video.key().isBlank())
                 .filter(video -> {
                     String type = video.type() == null ? "" : video.type().toLowerCase(Locale.ROOT);
                     return type.equals("trailer") || type.equals("teaser");
                 })
-                .sorted((a, b) -> Boolean.compare(b.official(), a.official()))
-                .map(TmdbVideo::key)
+                .sorted(Comparator
+                        .comparing((TmdbVideo video) -> "YouTube".equalsIgnoreCase(video.site()))
+                        .thenComparing(video -> !video.official())
+                        .thenComparing(TmdbVideo::site))
+                .map(video -> new VideoChoisie(video.site(), video.key()))
                 .findFirst()
                 .orElse(null);
     }
 
+    private String videoSite(TmdbVideos videos) {
+        VideoChoisie video = choisirVideo(videos);
+        return video == null ? null : video.site();
+    }
+
+    private String videoCle(TmdbVideos videos) {
+        VideoChoisie video = choisirVideo(videos);
+        return video == null ? null : video.cle();
+    }
+
     private String texte(String valeur) {
         return valeur == null || valeur.isBlank() ? null : valeur;
+    }
+
+    private record VideoChoisie(String site, String cle) {
     }
 
     private record EntreeCache(FilmMediaResponse media, Instant expireLe) {

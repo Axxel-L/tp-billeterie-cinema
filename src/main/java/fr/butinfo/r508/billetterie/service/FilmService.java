@@ -75,6 +75,7 @@ public class FilmService {
                 detail.dateSortie(),
                 media.afficheUrl(),
                 media.bandeauUrl(),
+                media.bandeAnnonceSite(),
                 media.bandeAnnonceCle(),
                 media.synopsis(),
                 note);

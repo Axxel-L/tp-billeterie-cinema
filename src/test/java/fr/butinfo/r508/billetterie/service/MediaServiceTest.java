@@ -148,6 +148,7 @@ class MediaServiceTest {
         assertThat(detail.dureeMinutes()).isEqualTo(132);
         assertThat(detail.dateSortie()).isEqualTo(LocalDate.of(2019, 5, 30));
         assertThat(detail.media().afficheUrl()).isEqualTo("https://image.test/w500/p.jpg");
+        assertThat(detail.media().bandeAnnonceSite()).isEqualTo("YouTube");
         assertThat(detail.media().bandeAnnonceCle()).isEqualTo("tr");
         serveur.verify();
     }

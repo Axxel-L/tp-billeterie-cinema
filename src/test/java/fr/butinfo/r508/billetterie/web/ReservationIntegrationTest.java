@@ -61,7 +61,8 @@ class ReservationIntegrationTest {
         mockMvc.perform(get("/api/films"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].titre").exists())
-                .andExpect(jsonPath("$[0].afficheUrl", containsString("image.tmdb.org")));
+                .andExpect(jsonPath("$[0].afficheUrl", containsString("image.tmdb.org")))
+                .andExpect(jsonPath("$[0].bandeAnnonceSite").value("YouTube"));
 
         mockMvc.perform(get("/actuator/health"))
                 .andExpect(status().isOk())

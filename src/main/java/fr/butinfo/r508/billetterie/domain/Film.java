@@ -36,6 +36,9 @@ public class Film {
     @Column(name = "bandeau_url", length = 512)
     private String bandeauUrl;
 
+    @Column(name = "bande_annonce_site", length = 32)
+    private String bandeAnnonceSite;
+
     @Column(name = "bande_annonce_cle", length = 32)
     private String bandeAnnonceCle;
 
@@ -49,18 +52,19 @@ public class Film {
     }
 
     public Film(String titre, String genre, int dureeMinutes, LocalDate dateSortie) {
-        this(titre, genre, dureeMinutes, dateSortie, null, null, null, null, null);
+        this(titre, genre, dureeMinutes, dateSortie, null, null, null, null, null, null);
     }
 
     public Film(String titre, String genre, int dureeMinutes, LocalDate dateSortie,
-                String afficheUrl, String bandeauUrl, String bandeAnnonceCle,
-                String synopsis, BigDecimal note) {
+                String afficheUrl, String bandeauUrl, String bandeAnnonceSite,
+                String bandeAnnonceCle, String synopsis, BigDecimal note) {
         this.titre = titre;
         this.genre = genre;
         this.dureeMinutes = dureeMinutes;
         this.dateSortie = dateSortie;
         this.afficheUrl = afficheUrl;
         this.bandeauUrl = bandeauUrl;
+        this.bandeAnnonceSite = bandeAnnonceSite;
         this.bandeAnnonceCle = bandeAnnonceCle;
         this.synopsis = synopsis;
         this.note = note;
@@ -96,6 +100,10 @@ public class Film {
 
     public String getBandeAnnonceCle() {
         return bandeAnnonceCle;
+    }
+
+    public String getBandeAnnonceSite() {
+        return bandeAnnonceSite;
     }
 
     public String getSynopsis() {
