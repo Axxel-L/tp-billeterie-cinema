@@ -1,25 +1,32 @@
 <p align="center">
-  <img src="docs/banner.svg" alt="Billetterie Cinéma — Spring Boot × React" width="100%">
+  <img src="docs/banner.svg" alt="Billetterie Cinéma, Spring Boot × React" width="100%">
 </p>
 
 <p align="center">
   <a href="https://github.com/Axxel-L/tp-billeterie-cinema/actions/workflows/ci.yml">
-    <img src="https://github.com/Axxel-L/tp-billeterie-cinema/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI">
+    <img src="https://github.com/Axxel-L/tp-billeterie-cinema/actions/workflows/ci.yml/badge.svg?branch=main&style=flat&labelColor=0b0c10" alt="CI">
   </a>
-  <img src="https://img.shields.io/badge/Java-25-ED8B00?logo=openjdk&logoColor=white" alt="Java 25">
-  <img src="https://img.shields.io/badge/Spring_Boot-4.1.1-6DB33F?logo=springboot&logoColor=white" alt="Spring Boot 4.1.1">
-  <img src="https://img.shields.io/badge/MySQL-8.4-4479A1?logo=mysql&logoColor=white" alt="MySQL 8.4">
-  <img src="https://img.shields.io/badge/Flyway-V1%20%E2%86%92%20V5-CC0200" alt="Flyway V1 à V5">
-  <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=0b0c10" alt="React 19">
-  <img src="https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white" alt="Vite 7">
-  <img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS 4">
-  <img src="https://img.shields.io/badge/Bun-1.x-000000?logo=bun&logoColor=white" alt="Bun">
-  <img src="https://img.shields.io/badge/tests-29%20passing-2ea44f" alt="29 tests">
+  <img src="https://img.shields.io/badge/Java-25-ED8B00?style=flat&logo=openjdk&logoColor=white&labelColor=0b0c10" alt="Java 25">
+  <img src="https://img.shields.io/badge/Spring_Boot-4.1.1-6DB33F?style=flat&logo=springboot&logoColor=white&labelColor=0b0c10" alt="Spring Boot 4.1.1">
+  <img src="https://img.shields.io/badge/MySQL-8.4-4479A1?style=flat&logo=mysql&logoColor=white&labelColor=0b0c10" alt="MySQL 8.4">
+  <img src="https://img.shields.io/badge/Flyway-V1%20%E2%86%92%20V5-CC0200?style=flat&labelColor=0b0c10" alt="Flyway V1 à V5">
+  <img src="https://img.shields.io/badge/React-19-61DAFB?style=flat&logo=react&logoColor=0b0c10&labelColor=0b0c10" alt="React 19">
+  <img src="https://img.shields.io/badge/Vite-7-646CFF?style=flat&logo=vite&logoColor=white&labelColor=0b0c10" alt="Vite 7">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=flat&logo=tailwindcss&logoColor=white&labelColor=0b0c10" alt="Tailwind CSS 4">
+  <img src="https://img.shields.io/badge/Bun-1.4-FBF0DF?style=flat&logo=bun&logoColor=000000&labelColor=0b0c10" alt="Bun 1.4">
+  <img src="https://img.shields.io/badge/Testcontainers-2.0-2496ED?style=flat&labelColor=0b0c10" alt="Testcontainers 2.0">
+  <img src="https://img.shields.io/badge/Tests-29_passing-2ea44f?style=flat&labelColor=0b0c10" alt="29 tests">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/github/last-commit/Axxel-L/tp-billeterie-cinema?style=flat&labelColor=0b0c10&color=ff3d71" alt="Dernier commit">
+  <img src="https://img.shields.io/github/repo-size/Axxel-L/tp-billeterie-cinema?style=flat&labelColor=0b0c10&color=7dd3fc" alt="Taille du dépôt">
+  <img src="https://img.shields.io/badge/Docker-ready-2496ED?style=flat&logo=docker&logoColor=white&labelColor=0b0c10" alt="Docker">
 </p>
 
 <p align="center">
   <strong>Axel Lalaut</strong> · <strong>Abigaïl Kettab-Coe</strong><br>
-  BUT3 Informatique — SAÉ R5.08 · 2026
+  BUT3 Informatique, SAÉ R5.08 · 2026
 </p>
 
 ---
@@ -66,12 +73,11 @@ dépassée**, même quand plusieurs clients réservent la même séance au même
 
 - 🎬 **Catalogue réel** : six films de démonstration avec affiches, bannières, synopsis, notes
   et bandes-annonces TMDB, stockés en base.
-- 🔎 **Recherche et import TMDB** : l'administrateur ne peut ajouter qu'un film existant ;
-  les métadonnées sont rechargées côté serveur, jamais fournies par le navigateur.
+- 🔎 **Recherche et import TMDB** : l'administrateur ne peut ajouter qu'un film existant. Les métadonnées sont rechargées côté serveur, jamais fournies par le navigateur.
 - 🗓️ **Séances filtrables** par période, avec places restantes calculées en temps réel.
 - 🎟️ **Réservation** : code unique, montant calculé côté serveur, confirmation immédiate.
 - 👤 **Mes réservations** : un client connecté voit ses séances à venir, ses codes et peut
-  annuler ; il ne peut pas toucher aux réservations d'un autre compte.
+  annuler. Il ne peut pas toucher aux réservations d'un autre compte.
 - 🛡️ **Trois rôles** : `CLIENT`, `PROGRAMMATEUR`, `ADMIN` (ADMIN hérite des deux autres).
 - 🧊 **Interface** : hero streaming, vidéo de fond, liquid glass sur la navbar et les boutons,
   GridScan CSS, écrans de chargement et images en `srcset`.
@@ -88,7 +94,7 @@ dépassée**, même quand plusieurs clients réservent la même séance au même
 | Frontend | **React 19**, Vite 7, TypeScript | SPA rapide, composants modernes |
 | Style | **Tailwind CSS 4**, Heroicons | Design system compact, icônes cohérentes |
 | Données SPA | TanStack Query | Cache, invalidations, états de chargement |
-| Outillage | **Bun**, Maven Wrapper | Install/dev/build frontend ; build backend reproductible |
+| Outillage | **Bun**, Maven Wrapper | Install/dev/build frontend. Build backend reproductible |
 | Tests | JUnit 5, Mockito, Testcontainers MySQL | Unitaires, MVC, JPA, intégration, concurrence |
 | CI/CD | GitHub Actions + Docker + GHCR | Tests, build, image publiée sur `main` |
 
@@ -126,6 +132,24 @@ bun run build    # génère src/main/resources/static
 
 > Le build Maven ne dépend **jamais** de Node/Bun. `clean verify` reste la référence du sujet.
 
+### Scripts racine
+
+Le `package.json` de la racine ne contient **aucune dépendance** : il orchestre les commandes.
+`bun run …` et `npm run …` fonctionnent tous les deux si Bun est installé.
+
+| Commande | Effet |
+| --- | --- |
+| `bun run init` | copie `.env`, démarre MySQL, installe le frontend |
+| `bun run dev` | lance Spring Boot sur `:8080` et Vite sur `:5173` |
+| `bun run build` | compile la SPA puis le JAR exécutable |
+| `bun run verify` | typecheck frontend + `./mvnw clean verify` |
+| `bun run start` | exécute le JAR déjà construit |
+
+```bash
+bun run init
+bun run dev        # ou bun run verify puis bun run build
+```
+
 ### Docker
 
 ```bash
@@ -157,11 +181,42 @@ cp .env.example .env
 ./mvnw spring-boot:run
 ```
 
-- `.env` est **ignoré par Git** et exclu du contexte Docker ; seul `.env.example` est versionné.
+- `.env` est **ignoré par Git** et exclu du contexte Docker. Seul `.env.example` est versionné.
 - Une variable exportée dans le shell reste prioritaire.
 - La clé est lue au démarrage : redémarrer après modification.
-- Sans clé, les six films de démo restent complets (médias stockés en base) ; seule la
+- Sans clé, les six films de démo restent complets (médias stockés en base). Seule la
   **recherche de nouveaux films** renvoie `503 TMDB_NON_CONFIGURE`.
+
+## Déploiement sur une autre machine
+
+Oui, un collègue peut cloner et lancer le projet, avec **JDK 25**, **Docker** (ou colima) et
+**Bun 1.4+**.
+
+```bash
+git clone https://github.com/Axxel-L/tp-billeterie-cinema.git
+cd tp-billeterie-cinema
+
+cp .env.example .env     # facultatif : TMDB_API_KEY
+bun run init             # MySQL + dépendances frontend
+bun run verify           # 29 tests, ou tests MySQL ignorés sans Docker
+bun run build            # SPA + JAR
+bun run start            # http://localhost:8080
+```
+
+Points à connaître :
+
+- `src/main/resources/static/` est **ignoré par Git** : sans `bun run build`, le JAR démarre
+  mais ne sert pas la SPA. C'est volontaire : le build Maven ne dépend pas de Bun.
+- Sans Docker, `clean verify` passe mais les tests Testcontainers sont ignorés. L'application
+  a tout de même besoin d'un MySQL accessible (`DB_URL`).
+- Sans `TMDB_API_KEY`, les six films de démo et leurs médias fonctionnent. La recherche de
+  nouveaux films répond `503 TMDB_NON_CONFIGURE`.
+- Les ports `3306` et `8080` doivent être libres. Modifiable dans `docker-compose.yml` et
+  `application.yml`.
+- Sous Windows, les scripts utilisent automatiquement `mvnw.cmd`.
+- Avec colima, `bun run verify` détecte `~/.colima/default/docker.sock` et exporte les
+  variables Testcontainers.
+- La CI GitHub Actions rejoue exactement ces étapes sur un runner propre.
 
 ## Architecture
 
@@ -254,7 +309,7 @@ Migrations Flyway :
 
 ## API
 
-Authentification **HTTP Basic** ; lectures publiques sans identifiants.
+Authentification **HTTP Basic**. Lectures publiques sans identifiants.
 
 | Méthode | Chemin | Accès | Réponses |
 | --- | --- | --- | --- |
@@ -342,10 +397,9 @@ sequenceDiagram
 - `@Transactional(isolation = READ_COMMITTED)` : en `REPEATABLE READ` (défaut MySQL), la
   lecture de la somme pourrait réutiliser un snapshot antérieur au commit concurrent.
 - L'annulation **libère** la capacité et ne prend pas le verrou : elle ne peut pas violer
-  l'invariant ; elle est idempotente (`204` si déjà annulée).
+  l'invariant. Elle est idempotente (`204` si déjà annulée).
 - Le verrou est en base : il protège aussi plusieurs instances applicatives.
-- Alternative écartée : `@Version` + retry, non déterministe et plus fragile à tester ;
-  compteur `places_restantes` dénormalisé, hors du modèle imposé.
+- Alternative écartée : `@Version` + retry, non déterministe et plus fragile à tester. Compteur `places_restantes` dénormalisé, hors du modèle imposé.
 
 Test de concurrence réel : capacité 20, 15 places déjà prises, deux requêtes simultanées de
 4 places → **exactement une réussit**, total final **19 ≤ 20**.
@@ -359,7 +413,7 @@ Test de concurrence réel : capacité 20, 15 places déjà prises, deux requête
 - **TMDB** : affiches, bannières, synopsis, notes et trailers. La clé reste côté serveur,
   cache mémoire 12 h, échec 10 min. Les six démos embarquent leurs médias : **aucune clé
   nécessaire pour les voir**.
-- **Liquid glass** : moteur officiel auto-hébergé, limité à la navbar et aux boutons ; les
+- **Liquid glass** : moteur officiel auto-hébergé, limité à la navbar et aux boutons. Les
   panneaux utilisent un verre CSS sans filtre SVG pour préserver les performances.
 - **GridScan CSS** : grille en perspective + faisceau animé, une seule animation `transform`,
   pas de WebGL ni de shader plein écran.
@@ -368,16 +422,15 @@ Test de concurrence réel : capacité 20, 15 places déjà prises, deux requête
 - **Images** : `srcset` TMDB (w342 / w500 / w780), `loading="lazy"`, `decoding="async"`,
   `fetchPriority` sur le hero, fondu à l'arrivée. Aucune requête média par carte : les champs
   arrivent avec `/api/films`.
-- **Zéro ombre portée**, bordures et rayons généreux partout ; theme sombre, Manrope
+- **Zéro ombre portée**, bordures et rayons généreux partout. Theme sombre, Manrope
   auto-hébergée, icônes Heroicons.
 
 ## Sécurité
 
 - HTTP Basic, sessions `STATELESS`, **BCrypt**, hiérarchie `ADMIN > PROGRAMMATEUR` et
   `ADMIN > CLIENT`.
-- **CSRF désactivé** : aucun cookie de session, aucune requête ambiante à protéger ;
-  l'authentification est portée par l'en-tête `Authorization`.
-- Un `CLIENT` ne peut annuler que ses réservations (`client_username`) ; `ADMIN` peut tout
+- **CSRF désactivé** : aucun cookie de session, aucune requête ambiante à protéger. L'authentification est portée par l'en-tête `Authorization`.
+- Un `CLIENT` ne peut annuler que ses réservations (`client_username`). `ADMIN` peut tout
   annuler. Les codes sont générés avec `SecureRandom` et protégés par une contrainte unique.
 - Injections SQL : uniquement Spring Data / JPQL paramétré.
 - Aucun identifiant dans `localStorage` : l'en-tête Basic vit en mémoire et disparaît au
@@ -470,17 +523,17 @@ flowchart LR
   </tr>
 </table>
 
-Projet réalisé en binôme dans le cadre de la SAÉ **R5.08 — Développer pour le web**,
+Projet réalisé en binôme dans le cadre de la SAÉ **R5.08, Développer pour le web**,
 BUT3 Informatique.
 
 ## Compte rendu
 
-Le détail de la conception, des choix techniques, de la recette A1–A10 et du bilan est
+Le détail de la conception, des choix techniques, de la recette A1 à A10 et du bilan est
 disponible dans [`compte-rendu-kettab-lalaut.md`](compte-rendu-kettab-lalaut.md).
 
 ## Sources et remerciements
 
-- [React Bits — GridScan](https://reactbits.dev/backgrounds/grid-scan) (inspiration,
+- [React Bits, GridScan](https://reactbits.dev/backgrounds/grid-scan) (inspiration,
   réimplémenté en CSS pour la performance)
 - [Liquid Glass](https://liquidglass.dev/) pour le moteur navbar / boutons
 - [Heroicons](https://heroicons.com/) pour les icônes

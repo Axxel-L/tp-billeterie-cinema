@@ -27,6 +27,12 @@ cp .env.example .env                 # TMDB_API_KEY=... (ignoré par Git)
 ./mvnw spring-boot:run               # API sur :8080
 java -jar target/billetterie-cinema-1.0.0.jar
 
+bun run init                         # .env + MySQL + dépendances frontend
+bun run dev                          # backend :8080 + Vite :5173
+bun run build                        # SPA puis JAR
+bun run verify                       # typecheck + clean verify
+bun run start                        # exécute le JAR
+
 cd frontend
 bun install                          # jamais npm / pnpm / yarn
 bun run dev                          # Vite :5173, proxy /api -> :8080

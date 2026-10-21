@@ -1,0 +1,13 @@
+{
+  "name": "billetterie-cinema",
+  "private": true,
+  "version": "1.0.0",
+  "packageManager": "bun@1.4.2",
+  "scripts": {
+    "init": "bun run scripts/init.mjs",
+    "dev": "bun run scripts/dev.mjs",
+    "build": "bun run scripts/build.mjs",
+    "verify": "bun run scripts/verify.mjs",
+    "start": "java -jar target/billetterie-cinema-1.0.0.jar"
+  }
+}
