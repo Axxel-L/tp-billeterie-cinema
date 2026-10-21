@@ -183,3 +183,5 @@ src/test/java/………/
 - ………
 
 ## 14 Spécifications d'utilisation de l'IA
+IA utilisée : Deepseek V4.1 Flash 
+Applications utilisée Kilo Code
