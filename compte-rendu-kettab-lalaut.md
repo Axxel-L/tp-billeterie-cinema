@@ -184,7 +184,7 @@ src/test/java/………/
 ## 14 Spécifications d'utilisation de l'IA et autres sources
 
 IA utilisée : Deepseek V4.1 Flash 
-Applications utilisée Kilo Code
+Applications utilisée : Kilo Code
 
 Capture d'écran de la conversation avec Deepseek:
 ![image](https://media.discordapp.net/attachments/1290388444715159643/1562465280469246022/image.png?ex=6ada16b0&is=6ad8c530&hm=7a3f211dd653d188486d1d95bcbb56628931f0f0aea9b5dbb0294a64b999ddb3&=&format=webp&quality=lossless&width=1024&height=613)
