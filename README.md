@@ -73,7 +73,8 @@ dépassée**, même quand plusieurs clients réservent la même séance au même
 
 - 🎬 **Catalogue réel** : six films de démonstration avec affiches, bannières, synopsis, notes
   et bandes-annonces TMDB, stockés en base.
-- 🔎 **Recherche et import TMDB** : l'administrateur ne peut ajouter qu'un film existant. Les métadonnées sont rechargées côté serveur, jamais fournies par le navigateur.
+- 🔎 **Recherche et import TMDB** : l'administrateur ne peut ajouter qu'un film existant.
+  Les métadonnées sont rechargées côté serveur, jamais fournies par le navigateur.
 - 🗓️ **Séances filtrables** par période, avec places restantes calculées en temps réel.
 - 🎟️ **Réservation** : code unique, montant calculé côté serveur, confirmation immédiate.
 - 👤 **Mes réservations** : un client connecté voit ses séances à venir, ses codes et peut
