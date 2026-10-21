@@ -1,6 +1,6 @@
 # Examen TP – Billetterie de cinéma (BUT Info 3, R5.08)
 
-**Durée :** 4 h · **Individuel** · **Barème :** 20 points
+**Durée :** 4 h · **Par deux** · **Barème :** 20 points
 **Stack :** Java 25 · Maven · Spring Boot 4.1.1 · MySQL
 **Livrable :** dépôt Maven complet et exécutable
 **Commande de référence :** `./mvnw clean verify` (ou `.\mvnw.cmd clean verify` sous Windows)
