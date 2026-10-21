@@ -361,3 +361,11 @@ Captures de la conversation (liens externes, susceptibles d'expirer) :
 ![image2](https://media.discordapp.net/attachments/1290388444715159643/1562465280876216342/image.png?ex=6ada16b0&is=6ad8c530&hm=ff40878617fb396d678ab1d595f6cdd82a1687f3742a77e8481ba04c41e66e1b&=&format=webp&quality=lossless&width=1024&height=613)
 ![image3](https://media.discordapp.net/attachments/1290388444715159643/1562465281215828140/image.png?ex=6ada16b0&is=6ad8c530&hm=e4f724da7088558d3cf5d2d44bbe2a68dea1906a316528442436091b798073eb&=&format=webp&quality=lossless&width=1280&height=238)
 ![image4](https://media.discordapp.net/attachments/1290388444715159643/1562465281639456870/image.png?ex=6ada16b0&is=6ad8c530&hm=4bf2ff0710a8fbb5ba87cc6426f9de0837d01e74835900f3deded8d2d2e58046&=&format=webp&quality=lossless&width=1280&height=183)
+![image5](https://media.discordapp.net/attachments/1290388444715159643/1562465282096758976/image.png?ex=6ada16b0&is=6ad8c530&hm=860510d79ef6ccf7fc2d2cefaf09c7a6f6c634caf13e2d7dbf3cde3b571c58fe&=&format=webp&quality=lossless&width=1024&height=613)
+![image6](https://media.discordapp.net/attachments/1290388444715159643/1562465282491031562/image.png?ex=6ada16b0&is=6ad8c530&hm=0a5116b8686d593ca33c54aa5484737da2b1809efd276581caeaf63a188ea7ef&=&format=webp&quality=lossless&width=1024&height=613)
+![image7](https://media.discordapp.net/attachments/1290388444715159643/1562465282906136636/image.png?ex=6ada16b0&is=6ad8c530&hm=19f6d78ee1701d5a89809baaedcd631c4c22de149d98ca74ab16f69fb168f3e2&=&format=webp&quality=lossless&width=1024&height=613)
+![image8](https://media.discordapp.net/attachments/1290388444715159643/1562465283241803877/image.png?ex=6ada16b0&is=6ad8c530&hm=8c8527af4181127df0461b96ff618ddc027ae9d98025539cc74eb8724461df36&=&format=webp&quality=lossless&width=1024&height=613)
+![image9](https://media.discordapp.net/attachments/1290388444715159643/1562476964835762307/image.png?ex=6ada2191&is=6ad8d011&hm=46aefb8454696ab6dc801729527b91a92f9fa07ef5c182e535d34f89f81a0584&=&format=webp&quality=lossless&width=1024&height=613)
+![image10](https://media.discordapp.net/attachments/1290388444715159643/1562476965200531506/image.png?ex=6ada2191&is=6ad8d011&hm=3e1bf9a737d47d434eee66bffd17b3de6af719b95d4bdc9d3c685bae61a53ebc&=&format=webp&quality=lossless&width=1024&height=613)
+
+Pour les animations de fond : [React Bits](https://reactbits.dev/).
