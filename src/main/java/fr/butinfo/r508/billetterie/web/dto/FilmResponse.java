@@ -9,10 +9,24 @@ public record FilmResponse(
         String titre,
         String genre,
         int dureeMinutes,
-        LocalDate dateSortie
+        LocalDate dateSortie,
+        String afficheUrl,
+        String bandeauUrl,
+        String bandeAnnonceCle,
+        String synopsis,
+        Double note
 ) {
     public static FilmResponse from(Film film) {
-        return new FilmResponse(film.getId(), film.getTitre(), film.getGenre(),
-                film.getDureeMinutes(), film.getDateSortie());
+        return new FilmResponse(
+                film.getId(),
+                film.getTitre(),
+                film.getGenre(),
+                film.getDureeMinutes(),
+                film.getDateSortie(),
+                film.getAfficheUrl(),
+                film.getBandeauUrl(),
+                film.getBandeAnnonceCle(),
+                film.getSynopsis(),
+                film.getNote() == null ? null : film.getNote().doubleValue());
     }
 }
