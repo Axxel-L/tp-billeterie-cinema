@@ -24,9 +24,8 @@ Vérifier que Maven utilise bien Java 25 :
 docker compose up -d
 ```
 
-- Base : `………`
-- Port : `………`
-- Utilisateur / mot de passe de **développement** : définis dans `compose.yaml` / `application.properties` (aucun secret de production dans le dépôt)
+- Port : `3306`
+- Utilisateur / mot de passe de **développement** : définis dans `docker-compose.yaml` (aucun secret de production dans le dépôt)
 
 Les tables sont créées **uniquement par Flyway** au démarrage (`spring.jpa.hibernate.ddl-auto=validate`).
 
