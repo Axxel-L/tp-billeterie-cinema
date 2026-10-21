@@ -4,7 +4,6 @@ import type {
   MouseEventHandler,
   ReactNode,
 } from "react";
-import { Link } from "react-router-dom";
 
 type PanelProps = ComponentPropsWithoutRef<"div"> & {
   radius?: string | number;
@@ -50,38 +49,25 @@ interface ButtonProps {
 
 export function GlassButton({
   children,
-  tone = "clear",
-  type = "button",
+  tone,
+  type,
   disabled,
   onClick,
   href,
   className,
   ariaLabel,
 }: ButtonProps) {
-  const classes = `glass-button glass-button--${tone}${className ? ` ${className}` : ""}`;
-
-  if (href) {
-    return (
-      <Link
-        to={href}
-        className={classes}
-        aria-label={ariaLabel}
-        onClick={onClick as unknown as MouseEventHandler<HTMLAnchorElement>}
-      >
-        {children}
-      </Link>
-    );
-  }
-
   return (
-    <button
+    <lg-button
+      tone={tone}
       type={type}
-      className={classes}
-      onClick={onClick}
       disabled={disabled}
+      onClick={onClick}
+      href={href}
+      className={className}
       aria-label={ariaLabel}
     >
-      {children}
-    </button>
+      <span className="contents">{children}</span>
+    </lg-button>
   );
 }

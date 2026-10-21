@@ -33,3 +33,8 @@ createRoot(racine).render(
     </QueryClientProvider>
   </StrictMode>,
 );
+
+const moduleVerre = "/liquidglass/components.js";
+setTimeout(() => {
+  void import(/* @vite-ignore */ moduleVerre).catch(() => undefined);
+}, 0);
