@@ -289,7 +289,8 @@ Dockerfile                         build Bun + Maven + runtime JRE 25
 
 - **Fichiers « 2 », « 3 »…** : le dépôt est dans un dossier synchronisé iCloud, qui peut
   créer des copies de conflit. Avant un build :
-  `find src -name "* [0-9].*" -delete` puis `./mvnw clean verify`.
+  `find -E . -path ./.git -prune -o -type f -regex '.* [0-9]+(\.[^/]*)?$' -delete`
+  puis `./mvnw clean verify`.
 - **Testcontainers** : avec colima, exporter `DOCKER_HOST` et
   `TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE` (voir plus haut), sinon les tests MySQL sont
   ignorés.

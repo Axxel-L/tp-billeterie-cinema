@@ -81,7 +81,8 @@ les autres doivent rester verts.
 - Le build Maven ne doit jamais dépendre de Node/Bun.
 - `RestClient.Builder` n'est pas auto-configuré : construire le client dans `MediaConfig`.
 - Le dépôt est dans un dossier synchronisé iCloud : des copies « fichier 2.java » peuvent
-  apparaître. Les supprimer avant de builder (`find src -name "* [0-9].*" -delete`) ;
+  apparaître. Les supprimer avant de builder :
+  `find -E . -path ./.git -prune -o -type f -regex '.* [0-9]+(\.[^/]*)?$' -delete` ;
   `.gitignore` ignore ces suffixes.
 
 ## Médias et catalogue
