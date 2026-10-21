@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.junit.jupiter.Container;
@@ -22,6 +23,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -32,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestPropertySource(properties = "app.tmdb.api-key=")
 @Testcontainers(disabledWithoutDocker = true)
 class ReservationIntegrationTest {
 
@@ -80,12 +85,22 @@ class ReservationIntegrationTest {
 
         String code = JsonPath.read(resultat.getResponse().getContentAsString(), "$.code");
 
+        mockMvc.perform(get("/api/reservations/mes-reservations")
+                        .with(httpBasic("client", "client123")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[*].code", hasItem(code)));
+
         mockMvc.perform(get("/api/seances/{id}", seance.getId()))
                 .andExpect(jsonPath("$.placesRestantes").value(17));
 
         mockMvc.perform(delete("/api/reservations/{code}", code)
                         .with(httpBasic("client", "client123")))
                 .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/reservations/mes-reservations")
+                        .with(httpBasic("client", "client123")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[*].code", not(hasItem(code))));
 
         mockMvc.perform(get("/api/seances/{id}", seance.getId()))
                 .andExpect(jsonPath("$.placesRestantes").value(20));
@@ -133,6 +148,28 @@ class ReservationIntegrationTest {
                         .content("""
                                 {"nom":"Salle interdite","capacite":50}
                                 """))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void lesFilmsDeDemonstrationOntLeursMedias() throws Exception {
+        mockMvc.perform(get("/api/films/{id}/media", 1))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.afficheUrl", containsString("image.tmdb.org")))
+                .andExpect(jsonPath("$.bandeAnnonceCle").isNotEmpty());
+    }
+
+    @Test
+    void laRechercheTmdbEstProtegeeEtSignaleLabsenceDeCle() throws Exception {
+        mockMvc.perform(get("/api/programmation/films/recherche")
+                        .param("titre", "Dune")
+                        .with(httpBasic("programmateur", "programmateur123")))
+                .andExpect(status().isServiceUnavailable())
+                .andExpect(jsonPath("$.code").value("TMDB_NON_CONFIGURE"));
+
+        mockMvc.perform(get("/api/programmation/films/recherche")
+                        .param("titre", "Dune")
+                        .with(httpBasic("client", "client123")))
                 .andExpect(status().isForbidden());
     }
 

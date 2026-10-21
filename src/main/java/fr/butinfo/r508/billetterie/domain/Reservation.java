@@ -32,6 +32,9 @@ public class Reservation {
     @Column(name = "email_client", nullable = false, length = 254)
     private String emailClient;
 
+    @Column(name = "client_username", length = 80)
+    private String clientUsername;
+
     @Column(name = "nombre_places", nullable = false)
     private int nombrePlaces;
 
@@ -57,6 +60,14 @@ public class Reservation {
 
     public void annuler() {
         this.statut = StatutReservation.ANNULEE;
+    }
+
+    public void assignerClient(String clientUsername) {
+        this.clientUsername = clientUsername;
+    }
+
+    public String getClientUsername() {
+        return clientUsername;
     }
 
     public Long getId() {

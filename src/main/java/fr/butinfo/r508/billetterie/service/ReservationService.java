@@ -8,6 +8,7 @@ import fr.butinfo.r508.billetterie.error.ReservationIntrouvableException;
 import fr.butinfo.r508.billetterie.error.SeanceIntrouvableException;
 import fr.butinfo.r508.billetterie.repository.ReservationRepository;
 import fr.butinfo.r508.billetterie.repository.SeanceRepository;
+import fr.butinfo.r508.billetterie.web.dto.ReservationClientResponse;
 import fr.butinfo.r508.billetterie.web.dto.ReservationRequest;
 import fr.butinfo.r508.billetterie.web.dto.ReservationResponse;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -37,13 +39,18 @@ public class ReservationService {
         this.seanceRepository = seanceRepository;
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public ReservationResponse creer(ReservationRequest requete) {
+        return creer(requete, "client");
+    }
+
     /**
      * Verrou pessimiste sur la séance : la lecture des places déjà réservées et
      * l'insertion de la nouvelle réservation forment une seule section critique,
      * y compris entre plusieurs instances applicatives.
      */
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public ReservationResponse creer(ReservationRequest requete) {
+    public ReservationResponse creer(ReservationRequest requete, String clientUsername) {
         Seance seance = seanceRepository.findByIdForUpdate(requete.seanceId())
                 .orElseThrow(() -> new SeanceIntrouvableException(requete.seanceId()));
 
@@ -62,6 +69,7 @@ public class ReservationService {
                 requete.nombrePlaces(),
                 StatutReservation.CONFIRMEE,
                 LocalDateTime.now());
+        reservation.assignerClient(clientUsername);
         reservationRepository.save(reservation);
 
         return ReservationResponse.from(reservation, montant(seance, requete.nombrePlaces()));
@@ -73,12 +81,40 @@ public class ReservationService {
      */
     @Transactional
     public void annuler(String code) {
+        annuler(code, null, true);
+    }
+
+    @Transactional
+    public void annuler(String code, String clientUsername, boolean administrateur) {
         Reservation reservation = reservationRepository.findByCode(code)
                 .orElseThrow(() -> new ReservationIntrouvableException(code));
+
+        if (!administrateur
+                && reservation.getClientUsername() != null
+                && !reservation.getClientUsername().equals(clientUsername)) {
+            throw new ReservationIntrouvableException(code);
+        }
+
         if (reservation.getStatut() == StatutReservation.ANNULEE) {
             return;
         }
         reservation.annuler();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReservationClientResponse> mesReservations(String clientUsername) {
+        return reservationRepository
+                .mesReservations(clientUsername, StatutReservation.CONFIRMEE, LocalDateTime.now())
+                .stream()
+                .map(reservation -> new ReservationClientResponse(
+                        reservation.getCode(),
+                        reservation.getSeance().getFilm().getTitre(),
+                        reservation.getSeance().getSalle().getNom(),
+                        reservation.getSeance().getDebut(),
+                        reservation.getNombrePlaces(),
+                        montant(reservation.getSeance(), reservation.getNombrePlaces()),
+                        reservation.getStatut()))
+                .toList();
     }
 
     private BigDecimal montant(Seance seance, int nombrePlaces) {

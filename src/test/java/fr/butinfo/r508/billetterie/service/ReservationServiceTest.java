@@ -21,12 +21,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -109,5 +111,34 @@ class ReservationServiceTest {
 
         assertThatThrownBy(() -> reservationService.annuler("RES-INCONNU"))
                 .isInstanceOf(ReservationIntrouvableException.class);
+    }
+
+    @Test
+    void unClientNePeutPasAnnulerLaReservationDUnAutre() {
+        Reservation reservation = new Reservation("RES-AUTRE00001",
+                seance, "autre@example.test", 1, StatutReservation.CONFIRMEE, LocalDateTime.now());
+        reservation.assignerClient("autre");
+        when(reservationRepository.findByCode("RES-AUTRE00001")).thenReturn(Optional.of(reservation));
+
+        assertThatThrownBy(() -> reservationService.annuler("RES-AUTRE00001", "client", false))
+                .isInstanceOf(ReservationIntrouvableException.class);
+
+        assertThat(reservation.getStatut()).isEqualTo(StatutReservation.CONFIRMEE);
+    }
+
+    @Test
+    void mesReservationsExposeLeCodeLeFilmEtLeMontant() {
+        Reservation reservation = new Reservation("RES-MES0000001",
+                seance, "lea@example.test", 2, StatutReservation.CONFIRMEE, LocalDateTime.now());
+        reservation.assignerClient("client");
+        when(reservationRepository.mesReservations(eq("client"), eq(StatutReservation.CONFIRMEE), any()))
+                .thenReturn(List.of(reservation));
+
+        var resultat = reservationService.mesReservations("client");
+
+        assertThat(resultat).hasSize(1);
+        assertThat(resultat.getFirst().code()).isEqualTo("RES-MES0000001");
+        assertThat(resultat.getFirst().filmTitre()).isEqualTo("Parasite");
+        assertThat(resultat.getFirst().montantTotal()).isEqualByComparingTo("23.00");
     }
 }

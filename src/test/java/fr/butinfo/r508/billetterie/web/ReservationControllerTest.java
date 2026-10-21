@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -41,7 +42,7 @@ class ReservationControllerTest {
     @Test
     @WithMockUser(roles = "CLIENT")
     void creationValideRenvoie201EtLeContrat() throws Exception {
-        when(reservationService.creer(any())).thenReturn(new ReservationResponse(
+        when(reservationService.creer(any(), anyString())).thenReturn(new ReservationResponse(
                 "RES-ABCDEFGHJK", StatutReservation.CONFIRMEE, 3, new BigDecimal("29.70"),
                 12L, "lea@example.test", LocalDateTime.now()));
 
