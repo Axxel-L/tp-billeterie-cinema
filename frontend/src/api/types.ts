@@ -8,6 +8,7 @@ export interface Film {
   dateSortie: string;
   afficheUrl?: string;
   bandeauUrl?: string;
+  bandeAnnonceSite?: string;
   bandeAnnonceCle?: string;
   synopsis?: string;
   note?: number;

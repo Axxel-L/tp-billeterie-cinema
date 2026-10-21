@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ClockIcon, PlayIcon, StarIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import type { Film } from "../api/types";
 import { formatDateCourte, initiales } from "../lib/format";
+import { urlVideo } from "../lib/video";
 import { GlassButton, GlassPanel } from "./Glass";
 import { GlassLink } from "./GlassLink";
 import { SmartImage, tmdbSrcSet } from "./SmartImage";
@@ -9,10 +10,11 @@ import { SmartImage, tmdbSrcSet } from "./SmartImage";
 interface Props {
   film: Film;
   onClose: () => void;
+  lancerBandeAnnonce?: boolean;
 }
 
-export function FilmDialog({ film, onClose }: Props) {
-  const [bandeAnnonce, setBandeAnnonce] = useState(false);
+export function FilmDialog({ film, onClose, lancerBandeAnnonce = false }: Props) {
+  const [bandeAnnonce, setBandeAnnonce] = useState(lancerBandeAnnonce);
   const [videoChargee, setVideoChargee] = useState(false);
 
   useEffect(() => {
@@ -31,6 +33,9 @@ export function FilmDialog({ film, onClose }: Props) {
   }, [onClose]);
 
   const cle = film.bandeAnnonceCle;
+  const sourceVideo = bandeAnnonce
+    ? urlVideo(film.bandeAnnonceSite ?? "YouTube", cle, { autoplay: true, muted: false })
+    : undefined;
 
   return (
     <div
@@ -129,8 +134,8 @@ export function FilmDialog({ film, onClose }: Props) {
               ))}
             </dl>
 
-            {bandeAnnonce && cle ? (
-              <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-white/10 bg-black">
+            {sourceVideo ? (
+              <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-white/15 bg-black">
                 {!videoChargee ? (
                   <div className="absolute inset-0 grid place-items-center text-xs uppercase tracking-[0.2em] text-mist">
                     Chargement de la bande-annonce…
@@ -138,7 +143,7 @@ export function FilmDialog({ film, onClose }: Props) {
                 ) : null}
                 <iframe
                   title={`Bande-annonce de ${film.titre}`}
-                  src={`https://www.youtube-nocookie.com/embed/${cle}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
+                  src={sourceVideo}
                   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   onLoad={() => setVideoChargee(true)}

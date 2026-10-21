@@ -21,7 +21,7 @@ export function FilmCard({ film, index, onOuvrir }: Props) {
     <button
       type="button"
       onClick={() => onOuvrir(film)}
-      className="group relative block w-full overflow-hidden rounded-3xl border border-white/10 bg-ink-2 text-left shadow-[0_30px_80px_-40px_rgba(0,0,0,0.95)] transition duration-300 hover:-translate-y-1.5 hover:border-white/25 hover:shadow-[0_40px_100px_-40px_rgba(255,61,113,0.35)]"
+      className="group relative block w-full overflow-hidden rounded-3xl border border-white/20 bg-ink-2 text-left transition duration-300 hover:-translate-y-1.5 hover:border-white/30"
       aria-label={`Voir la fiche de ${film.titre}`}
     >
       <div className="relative aspect-[2/3] overflow-hidden">
@@ -29,7 +29,7 @@ export function FilmCard({ film, index, onOuvrir }: Props) {
           className="absolute inset-0 flex items-center justify-center p-6"
           style={{ background: DEGRADES[index % DEGRADES.length] }}
         >
-          <span className="font-display text-6xl font-black tracking-tighter text-white/90 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)]">
+          <span className="font-display text-6xl font-black tracking-tighter text-white/90">
             {initiales(film.titre)}
           </span>
         </div>
