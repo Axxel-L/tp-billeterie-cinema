@@ -75,9 +75,11 @@ public class SecurityConfig {
                         .requestMatchers("/", "/index.html", "/assets/**", "/liquidglass/**",
                                 "/favicon.ico", "/favicon.svg", "/error",
                                 "/films", "/seances", "/reservation", "/admin").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/programmation/films", "/api/programmation/seances")
+                        .requestMatchers("/api/programmation/**")
                         .hasAnyRole("PROGRAMMATEUR", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/reservations/mes-reservations")
+                        .hasAnyRole("CLIENT", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/reservations").hasAnyRole("CLIENT", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/reservations/**").hasAnyRole("CLIENT", "ADMIN")
                         .anyRequest().authenticated())
