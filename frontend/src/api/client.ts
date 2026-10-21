@@ -1,7 +1,6 @@
 import type {
   ApiErrorBody,
   Film,
-  FilmMedia,
   FilmPayload,
   FilmRecherche,
   Me,
@@ -102,8 +101,6 @@ export const api = {
 
   films: (params: { titre?: string; genre?: string } = {}) =>
     request<Film[]>(`/api/films${query(params)}`),
-
-  filmMedia: (id: number) => request<FilmMedia>(`/api/films/${id}/media`),
 
   rechercherFilms: (titre: string) =>
     request<FilmRecherche[]>(`/api/programmation/films/recherche${query({ titre })}`),

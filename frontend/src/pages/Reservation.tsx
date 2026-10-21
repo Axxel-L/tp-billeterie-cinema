@@ -6,7 +6,7 @@ import { api, ApiException } from "../api/client";
 import type { Reservation } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import { GlassButton, GlassPanel } from "../components/Glass";
-import { Skeleton } from "../components/Skeleton";
+import { PageGate } from "../components/LoadingScreen";
 import { formatHeure, formatJour, formatPrix, plageParDefaut } from "../lib/format";
 
 export default function ReservationPage() {
@@ -103,6 +103,10 @@ export default function ReservationPage() {
   }
 
   return (
+    <PageGate
+      loading={seances.isPending && !seances.data}
+      label="Chargement des séances…"
+    >
     <div className="mx-auto w-full max-w-7xl px-4 pb-24 pt-32 sm:px-6 lg:px-8">
       <header className="max-w-3xl">
         <p className="eyebrow">Billetterie</p>
@@ -129,26 +133,22 @@ export default function ReservationPage() {
           <form className="space-y-5" onSubmit={soumettre}>
             <label className="block">
               <span className="field-label">Séance</span>
-              {seances.isPending ? (
-                <Skeleton className="h-12 w-full" />
-              ) : (
-                <select
-                  className="select"
-                  value={seanceId ?? ""}
-                  onChange={(evenement) => setSeanceId(Number(evenement.target.value))}
-                  required
-                >
-                  <option value="" disabled>
-                    Choisir une séance
+              <select
+                className="select"
+                value={seanceId ?? ""}
+                onChange={(evenement) => setSeanceId(Number(evenement.target.value))}
+                required
+              >
+                <option value="" disabled>
+                  Choisir une séance
+                </option>
+                {seances.data?.map((seance) => (
+                  <option key={seance.id} value={seance.id}>
+                    {formatJour(seance.debut)} · {formatHeure(seance.debut)} · {seance.filmTitre} (
+                    {seance.placesRestantes} places)
                   </option>
-                  {seances.data?.map((seance) => (
-                    <option key={seance.id} value={seance.id}>
-                      {formatJour(seance.debut)} · {formatHeure(seance.debut)} · {seance.filmTitre} (
-                      {seance.placesRestantes} places)
-                    </option>
-                  ))}
-                </select>
-              )}
+                ))}
+              </select>
             </label>
 
             <label className="block">
@@ -296,5 +296,6 @@ export default function ReservationPage() {
         </div>
       </div>
     </div>
+    </PageGate>
   );
 }

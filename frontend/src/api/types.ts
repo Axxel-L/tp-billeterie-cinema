@@ -6,9 +6,6 @@ export interface Film {
   genre: string;
   dureeMinutes: number;
   dateSortie: string;
-}
-
-export interface FilmMedia {
   afficheUrl?: string;
   bandeauUrl?: string;
   bandeAnnonceCle?: string;

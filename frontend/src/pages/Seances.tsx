@@ -7,6 +7,7 @@ import { useAuth } from "../auth/AuthContext";
 import { AnimatedList } from "../components/AnimatedList";
 import { GlassPanel } from "../components/Glass";
 import { GlassLink } from "../components/GlassLink";
+import { PageGate } from "../components/LoadingScreen";
 import { Skeleton } from "../components/Skeleton";
 import { formatHeure, formatJour, formatPrix, plageParDefaut } from "../lib/format";
 
@@ -62,6 +63,10 @@ export default function Seances() {
   const groupes = useMemo(() => grouperParJour(requete.data ?? []), [requete.data]);
 
   return (
+    <PageGate
+      loading={requete.isPending && !requete.data}
+      label="Chargement des séances…"
+    >
     <div className="mx-auto w-full max-w-7xl px-4 pb-24 pt-32 sm:px-6 lg:px-8">
       <header className="max-w-3xl">
         <p className="eyebrow">Agenda</p>
@@ -192,12 +197,7 @@ export default function Seances() {
         </div>
       </GlassPanel>
 
-      {requete.isPending ? (
-        <div className="mt-10 space-y-4">
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-24 w-full" />
-        </div>
-      ) : requete.isError ? (
+      {requete.isError ? (
         <p className="mt-10 rounded-2xl border border-brand/30 bg-brand/10 p-5 text-sm text-brand-2" role="alert">
           Impossible de charger les séances pour le moment.
         </p>
@@ -263,5 +263,6 @@ export default function Seances() {
         </AnimatedList>
       )}
     </div>
+    </PageGate>
   );
 }

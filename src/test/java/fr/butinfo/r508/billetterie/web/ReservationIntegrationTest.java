@@ -60,7 +60,8 @@ class ReservationIntegrationTest {
     void migrationsAppliqueesEtLecturePublique() throws Exception {
         mockMvc.perform(get("/api/films"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].titre").exists());
+                .andExpect(jsonPath("$[0].titre").exists())
+                .andExpect(jsonPath("$[0].afficheUrl", containsString("image.tmdb.org")));
 
         mockMvc.perform(get("/actuator/health"))
                 .andExpect(status().isOk())
