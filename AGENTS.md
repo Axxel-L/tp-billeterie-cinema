@@ -1,0 +1,100 @@
+# AGENTS.md — Billetterie cinéma
+
+## Contexte
+
+Application de billetterie (BUT Info 3, R5.08) : back-end Spring Boot + SPA React.
+Le sujet impose la stack et le barème ; toute modification doit préserver
+`./mvnw clean verify` sur un clone propre.
+
+## Stack verrouillée
+
+- Java **25** (`maven.compiler.release=25`, jamais `source`/`target`)
+- Spring Boot **4.1.1** (parent Maven, ne pas changer de version)
+- Maven Wrapper versionné (`mvnw`, `mvnw.cmd`, `.mvn/`)
+- MySQL 8 (Docker Compose), Flyway, Hibernate `ddl-auto=validate`
+- springdoc-openapi **3.1.1**
+- Frontend : Vite + React 19 + TypeScript, isolé dans `frontend/`
+
+Ne pas ajouter de dépendance sans nécessité absolue (pas de Lombok, MapStruct,
+Redis, Kafka, JWT, paiement). Les versions gérées par le parent ne se répètent pas.
+
+## Commandes
+
+```bash
+docker compose up -d                 # MySQL local (8.4)
+./mvnw clean verify                  # build + tests : la référence
+./mvnw spring-boot:run               # API sur :8080
+java -jar target/billetterie-cinema-1.0.0.jar
+
+cd frontend
+bun install                          # jamais npm / pnpm / yarn
+bun run dev                          # Vite :5173, proxy /api -> :8080
+bun run typecheck
+bun run build                        # build vers src/main/resources/static
+```
+
+Le backend utilise Maven et le frontend **Bun** exclusivement (installation,
+scripts, build). Ne pas régénérer `package-lock.json`.
+
+Avec colima (macOS), Testcontainers a besoin de :
+
+```bash
+export DOCKER_HOST=unix://$HOME/.colima/default/docker.sock
+export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
+```
+
+Sans Docker, les tests Testcontainers sont **ignorés** (`disabledWithoutDocker`),
+les autres doivent rester verts.
+
+## Règles d'architecture
+
+- Contrôleurs fins, règles métier dans `service`, accès données dans `repository`.
+- DTO = `record` immuables dans `web/dto` ; ne jamais exposer une entité JPA.
+- Validation Jakarta sur les entrées, avant l'appel métier.
+- Erreurs centralisées dans `error/GlobalExceptionHandler` → corps `ApiError`,
+  jamais de stack trace ni de SQL dans la réponse.
+- Nommage métier en français (`Film`, `Salle`, `Seance`, `Reservation`),
+  technique en anglais (`Service`, `Repository`, `Controller`).
+
+## Invariants à ne pas casser
+
+- `somme(places CONFIRMEE) <= salle.capacite`, y compris en concurrence.
+- Création de réservation : `@Transactional(isolation = READ_COMMITTED)` +
+  `SeanceRepository.findByIdForUpdate` (`PESSIMISTIC_WRITE`). Aucun verrou mémoire.
+- Annulation : idempotente, ne peut que libérer de la capacité.
+- HTTP Basic + rôles `CLIENT`, `PROGRAMMATEUR`, `ADMIN` (ADMIN hérite des deux).
+- Lectures publiques : films, séances, salles, santé, OpenAPI, assets SPA.
+- Aucun secret réel ; les comptes de démo sont documentés dans le README.
+- Frontend : aucun token ni mot de passe dans `localStorage`, pas de CDN,
+  assets auto-hébergés, effets respectant `prefers-reduced-motion`.
+
+## Pièges connus
+
+- `@DataJpaTest` remplace la DataSource : garder `@AutoConfigureTestDatabase(replace = NONE)`.
+- MySQL est en `REPEATABLE READ` par défaut : l'isolation de la réservation est explicite.
+- `spring-boot-starter-webmvc-test`, `-data-jpa-test`, `-security-test` ont des
+  packages de test dédiés en Boot 4 (ex. `org.springframework.boot.webmvc.test.autoconfigure`).
+- Le build Maven ne doit jamais dépendre de Node/Bun.
+- `RestClient.Builder` n'est pas auto-configuré : construire le client dans `MediaConfig`.
+
+## Médias TMDB
+
+- `GET /api/films/{id}/media` renvoie affiche, bannière, clé YouTube, synopsis et note.
+- La clé vient uniquement de `TMDB_API_KEY` (v3 ou jeton v4) : jamais dans le frontend,
+  jamais dans un fichier versionné. Sans clé, l'API renvoie des champs vides et l'UI
+  utilise ses dégradés.
+- Cache mémoire 12 h ; un échec est mis en cache 10 min pour ne pas marteler TMDB.
+
+## CI et image
+
+- `.github/workflows/ci.yml` : Maven (backend), Bun (frontend), puis image GHCR sur `main`.
+- `Dockerfile` multi-stage : SPA compilée avec Bun, JAR compilé avec Maven, runtime JRE 25.
+- Le job de déploiement ne s'exécute que sur `main` et pousse `ghcr.io/<repo>:latest` + SHA.
+
+## Commits
+
+- Messages **en français**, préfixés : `feat:`, `fix:`, `chore:` (infra/outillage,
+  parfois noté `core:`), `docs:`, `test:`, `refactor:`.
+- Sujet à l'impératif, ≤ 72 caractères, puis un corps qui explique le **pourquoi**
+  et l'impact (barème, sécurité, concurrence, perf).
+- Un commit = un changement cohérent. Ne pas mélanger backend, frontend et CI.
